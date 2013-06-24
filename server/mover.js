@@ -108,7 +108,7 @@ module.exports = (function (){
 		update_public: { value: function (data){
 			if(this.disposed){ return}
 			if(!this.updated_public){
-				this.updated_public = {"id": this.id};
+				this.updated_public = {"id": this.id, "graphic": this.graphic};
 			}
 			for(var key in data){
 				this.updated_public[key] = data[key];
