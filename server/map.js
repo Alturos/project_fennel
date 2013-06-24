@@ -24,7 +24,7 @@ module.exports = (function (){
 				var region = regions_copy[region_name];
 				region.iterate()
 			}
-		},
+		}/*,
 		generate_dungeon: function (screens_width, file_name){
 			var file_system = require('fs');
 			var grid_text = '';
@@ -41,7 +41,7 @@ module.exports = (function (){
 				screen: undefined,
 			}
 			file_system.writeFile(__dirname+'/map.txt', grid_text);
-		}
+		}*/
 	};
 	map.region = {
 		id: undefined,
@@ -120,7 +120,7 @@ module.exports = (function (){
 					var compound_index = y*this.grid_width + x;
 					this.tile_grid[compound_index] = parseInt(tile_map.charAt(compound_index));
 					//if(x == 0 || x == this.grid_width-1 || (y == 0 && false) || (y == this.grid_height-1 && false) || Math.random()>0.9){
-					if(this.tile_grid[compound_index]){
+					if(this.tile_grid[compound_index] !== undefined){
 						
 					} else if(Math.random() > 0.95){
 						this.tile_grid[compound_index] = 1;
@@ -128,8 +128,7 @@ module.exports = (function (){
 						this.tile_grid[compound_index] = 2;
 					} else if(Math.random() > 0.95){
 						this.tile_grid[compound_index] = 3;
-					}
-					else{
+					} else{
 						this.tile_grid[compound_index] = 0;
 					}
 				}
@@ -267,7 +266,6 @@ module.exports = (function (){
 					break;
 				}
 			}
-			console.log('Adjacent: ('+pos_x+','+pos_y+')')
 			var parent_region = map.regions[this.region_id];
 			var new_screen = parent_region.find_screen(pos_x, pos_y);
 			/*if(!new_screen){

@@ -15,6 +15,7 @@ module.exports = (function (){
 			unit: require('./unit.js'),
 			usable: require('./usable.js'),
 			projectile: require('./projectile.js'),
+			dungeon_generator: require('./dungeon_generator.js'),
 			speed: DM.GAME_SPEED,
 			next_iteration: undefined,
 			players: Object.create(DM.list),
@@ -29,7 +30,17 @@ module.exports = (function (){
 					this.map.tile.constructor.call(Object.create(this.map.tile), "pillar", DM.MOVEMENT_WALL),
 					this.map.tile.constructor.call(Object.create(this.map.tile), "water", DM.MOVEMENT_WATER)
 				];
-				var create_screen = (function (binder){
+				var level_maze = this.dungeon_generator.generate_maze();
+				for(pos_y = 0; pos_y < level_maze.height; pos_y++){
+					for(pos_x = 0; pos_x < level_maze.width; pos_x++){
+						var maze_node = level_maze.node(pos_x, pos_y);
+						var new_screen = this.map.screen.constructor.call(Object.create(this.map.screen), pos_x, pos_y, 1, 1);
+						new_region.place_screen(new_screen);
+						new_screen.tile_set = shared_tile_set;
+						new_screen.setup(maze_node.tile_grid);
+					}
+				}
+				/*var create_screen = (function (binder){
 					return function (x, y, width, height){
 						var new_screen = binder.screen.constructor.call(Object.create(binder.screen), x, y, width, height);
 						new_region.place_screen(new_screen);
@@ -37,7 +48,7 @@ module.exports = (function (){
 						new_screen.setup();
 						return new_screen
 					};
-				})(this.map);
+				})(this.map);*/
 				/*
 				 * ###########
 				 * #.+.#<#.+.#
@@ -66,7 +77,7 @@ module.exports = (function (){
 				
 				*/
 				
-				create_screen(0,0,1,1)
+				/*create_screen(0,0,1,1)
 				create_screen(1,0,1,1)
 				create_screen(2,0,1,1)
 				create_screen(3,0,1,1)
@@ -88,7 +99,7 @@ module.exports = (function (){
 				
 				create_screen(0,4,1,1)
 				create_screen(1,4,1,1)
-				create_screen(3,4,2,1)
+				create_screen(3,4,2,1)*/
 				
 				this.map.regions[new_region.id] = new_region;
 				/*new_screen.tile_set[0] = Object.create(game.map.tile);
@@ -106,6 +117,7 @@ module.exports = (function (){
 				this.iterate();
 			},
 			add_client: function (new_client){
+				new_client.game = this;
 				if(!(this.state & DM.STATE_SETUP)){
 					this.setup();
 				}

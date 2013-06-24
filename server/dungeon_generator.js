@@ -12,6 +12,11 @@ module.exports = (function (){
 			new_maze.setup(5,5,0.5,0.5);
 			//new_maze.setup(15,10,0.6,0.5,1);
 			new_maze.generate();
+			for(var pos_y = 0; pos_y < new_maze.height; pos_y++){
+				for(var pos_x = 0; pos_x < new_maze.width; pos_x++){
+					new_maze.layout_screen(pos_x, pos_y);
+				}
+			}
 			return new_maze;
 		},
 		maze: {
@@ -41,10 +46,11 @@ module.exports = (function (){
 				return indexed_node;
 			},
 			generate: function (){
+				console.log('Generating')
 				this.generate_node_grid();
-				this.place_walls()
-				this.log_nodes()
-				this.log_divisions();
+//				this.place_divisions();
+				this.log_nodes();
+//				this.log_divisions();
 			},
 			generate_node_grid: function (){
 				var new_node;
@@ -59,9 +65,9 @@ module.exports = (function (){
 				var new_line = [];
 				old_line.length = this.width;
 				new_line.length = this.width;
-				for(pos_y = 0; pos_y < this.height; pos_y++){
+				for(var pos_y = 0; pos_y < this.height; pos_y++){
 					// Populate New Line
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						new_node = new_line[pos_x];
 						if(!new_node){
 							new_node = Object.create(generator.node, {
@@ -76,7 +82,7 @@ module.exports = (function (){
 						}
 					}
 					// Join Cells
-					for(pos_x = 0; pos_x < this.width-1; pos_x++){
+					for(var pos_x = 0; pos_x < this.width-1; pos_x++){
 						left_node = new_line[pos_x];
 						right_node = new_line[pos_x+1];
 						if(left_node.set !== right_node.set){
@@ -109,7 +115,7 @@ module.exports = (function (){
 					new_line = [];
 					new_line.length = this.width;
 					var sets = {};
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var indexed_node = old_line[pos_x];
 						var set_identifier = indexed_node.set;
 						var indexed_set;
@@ -144,7 +150,7 @@ module.exports = (function (){
 							}
 						}
 					}
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var old_node = old_line[pos_x];
 						delete old_node.set;
 					}
@@ -245,8 +251,11 @@ module.exports = (function (){
 				var columns = Math.max(1, Math.ceil(Math.random()*4));
 				var rows = Math.max(1, Math.ceil(Math.random()*4));
 				screen_maze.setup(columns, rows, 0.5, 0.5);
+				console.log("Screen: ("+x+','+y+")")
 				screen_maze.generate();
+				//screen_maze.log_nodes();
 				/*
+				0123456789abcde
 				###############
 				#.............# 1 : 13
 				#......#......# 2 : 6,6
@@ -255,25 +264,54 @@ module.exports = (function (){
 				100100010001001
 				0123456789abcde
 				*/
-				var room_sizes = [[13], [6,6], [3,5,3], [2,3,3,2]];
-				var boundries = [[15], [7,15], [4,10,15], [3,7,11,15]];
+				//var room_sizes = [[13], [6,6], [3,5,3], [2,3,3,2]];
+				var boundries = [[14], [7,14], [4,10,14], [3,7,11,14]];
 				var tile_grid = '';
 				var node_index_x = 0;
 				var node_index_y = 0;
+				var wall_x;
+				var wall_y;
 				for(var pos_y = 0; pos_y < map.screen_height; pos_y++){
-					var test_index = 
-					for(var pos_x = 0; pos_x < map.screen_width; pos_x++){
-						var node_index_x = 
-						var indexed_node = screen_maze.node(pos_x, pos_y);
-						
+					node_index_x = 0;
+					var test_index = boundries[rows-1].indexOf(pos_y);
+					if(test_index > -1){
+						wall_y = true;
+						node_index_y = Math.min(rows-1, test_index+1);
+					} else{
+						wall_y = false;
 					}
+					var line_log = '';
+					var fuckwad = ''
+					for(var pos_x = 0; pos_x < map.screen_width; pos_x++){
+						var test_index = boundries[columns-1].indexOf(pos_x);
+						if(test_index > -1){
+							wall_x = true;
+							node_index_x = Math.min(columns-1, test_index+1);
+						} else{
+							wall_x = false;
+						}
+						var indexed_node = screen_maze.node(node_index_x, node_index_y);
+						fuckwad += ''+node_index_x+''+node_index_y;
+						var tile_character = '0';
+						if(wall_y && !(indexed_node.connections&DM.NORTH)){
+							tile_character = '2';
+						}
+						if(wall_x && !(indexed_node.connections&DM.WEST)){
+							tile_character = '2';
+						}
+						tile_grid += tile_character;
+						line_log += tile_character
+					}
+					console.log(line_log)
+					//console.log(fuckwad)
 				}
+				node.tile_grid = tile_grid;
 			},
 			log_nodes: function (){
 				// Log results:
-				for(pos_y = 0; pos_y < this.height; pos_y++){
+				for(var pos_y = 0; pos_y < this.height; pos_y++){
 					var line_text = '';
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var indexed_node = this.node(pos_x, pos_y);
 						line_text += '#';
 						if(indexed_node.connections & generator.north){
@@ -285,7 +323,7 @@ module.exports = (function (){
 					}
 					console.log(line_text);
 					line_text = '';
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var indexed_node = this.node(pos_x, pos_y);
 						if(indexed_node.connections & generator.west){
 							line_text += ' ';
@@ -301,7 +339,7 @@ module.exports = (function (){
 					}
 					console.log(line_text);
 					line_text = '';
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var indexed_node = this.node(pos_x, pos_y);
 						line_text += '#';
 						if(indexed_node.connections & generator.south){
@@ -315,9 +353,9 @@ module.exports = (function (){
 				}
 			},
 			log_divisions: function (){
-				for(pos_y = 0; pos_y < this.height; pos_y++){
+				for(var pos_y = 0; pos_y < this.height; pos_y++){
 					var line_text = '';
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var indexed_node = this.node(pos_x, pos_y);
 						var divisions = indexed_node.division(DM.NORTH);
 						if(divisions === undefined){ divisions = '-'}
@@ -327,7 +365,7 @@ module.exports = (function (){
 					}
 					console.log(line_text);
 					line_text = '';
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var indexed_node = this.node(pos_x, pos_y);
 						var divisions = indexed_node.division(DM.WEST);
 						if(divisions === undefined){ divisions = '-'}
@@ -339,7 +377,7 @@ module.exports = (function (){
 					}
 					console.log(line_text);
 					line_text = '';
-					for(pos_x = 0; pos_x < this.width; pos_x++){
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var indexed_node = this.node(pos_x, pos_y);
 						var divisions = indexed_node.division(DM.SOUTH);
 						if(divisions === undefined){ divisions = '-'}
@@ -356,6 +394,7 @@ module.exports = (function (){
 			y: undefined,
 			connections: 0,
 			divisions: 0,
+			tile_grid: undefined,
 			division: function (direction, divisions){
 				var shift;
 				var new_division;
@@ -398,5 +437,5 @@ module.exports = (function (){
 			}
 		}
 	}
-	generator.generate_maze();
+	return generator;
 })();

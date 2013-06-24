@@ -9,6 +9,15 @@ module.exports = (function (){
 			socket.on('client_message', function (control_message) {
 				new_client.recieve_message(control_message);
 			});
+			socket.on('chat', function (message){
+				for(var client_index = 0; client_index <= new_client.game.players.length; client_index++){
+					var indexed_player = new_client.game.players[client_index];
+					if(!indexed_player){ continue}
+					var indexed_client = indexed_player.intelligence;
+					if(!indexed_client){ continue}
+					indexed_client.socket.emit('chat', message);
+				}
+			})
 			var connection_configuration = {
 			};
 			socket.emit('connection', connection_configuration);
