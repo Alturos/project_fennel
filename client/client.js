@@ -1,15 +1,15 @@
 // Dependant on environment_variables.js
 var client = {
 	preload: function (configuration){
-		console.log('trying')
 		this.resource_library.setup(function (){ client.setup(configuration)});
 	},
 	setup: function (configuration){
 		this.skin.setup(configuration.container_id);
 		this.unit_interface.setup(this.skin.canvas.width, this.skin.canvas.height);
-		this.key_capture.setup();
+		this.key_capture.setup(configuration);
 		this.focus(this.unit_interface);
 		this.networking.setup(configuration);
+		this.chat.setup(configuration.container_id);
 	},
 	screen: undefined,
 	eye: undefined,

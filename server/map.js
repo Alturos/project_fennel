@@ -115,22 +115,55 @@ module.exports = (function (){
 		setup: function (tile_map){
 			this.tile_grid.length = (this.screens_width*map.screen_width)*(this.screens_height*map.screen_height);
 			if(!tile_map){tile_map = '';}
+			var unit = require('./unit.js'); // This here to prevent circular reference before either map or unit are finished.
 			for(var y = 0; y < this.grid_height; y++){
 				for(var x = 0; x < this.grid_width; x++){
 					var compound_index = y*this.grid_width + x;
-					this.tile_grid[compound_index] = parseInt(tile_map.charAt(compound_index));
-					//if(x == 0 || x == this.grid_width-1 || (y == 0 && false) || (y == this.grid_height-1 && false) || Math.random()>0.9){
-					if(this.tile_grid[compound_index] !== undefined){
-						
-					} else if(Math.random() > 0.95){
-						this.tile_grid[compound_index] = 1;
-					} else if(Math.random() > 0.95){
-						this.tile_grid[compound_index] = 2;
-					} else if(Math.random() > 0.95){
-						this.tile_grid[compound_index] = 3;
-					} else{
-						this.tile_grid[compound_index] = 0;
+					var tile_set_index = parseInt(tile_map.charAt(compound_index));
+					this.tile_grid[compound_index] = tile_set_index;
+					// TODO: replace this monster placement.
+					var tile_count = this.grid_height*this.grid_width
+					if(tile_set_index == 0 && Math.random()*tile_count > tile_count - 5 && x!=0 && y!=0){
+						var monster_config = {
+							graphic: {value: 'bug1', writable: true},
+							faction: {value: DM.F_ENEMY},
+							touch_damage: {value: 1},
+							base_speed: {value: 1},
+							base_body: {value: 1}
+						}
+						var M = unit.constructor.call(Object.create(unit, monster_config), x*16, y*16, this);
+						M.intelligence_add({
+							handle_event: function (mover, event){
+								if(mover.dead){ return;}
+								switch(event.type){
+									case DM.EVENT_TAKE_TURN: {
+										var new_dir = mover.direction;
+										if(Math.random()*16 < 1){
+											switch(Math.floor(Math.random()*10)){
+												case 0: new_dir = DM.NORTH; break;
+												case 1: new_dir = DM.SOUTH; break;
+												case 2: new_dir = DM.EAST; break;
+												case 3: new_dir = DM.WEST; break;
+											}
+										}
+										mover.move(new_dir, mover.speed())
+										break;
+									}
+									case DM.EVENT_STOP: {
+										switch(Math.floor(Math.random()*4)){
+											case 0: mover.direction = DM.NORTH; break;
+											case 1: mover.direction = DM.SOUTH; break;
+											case 2: mover.direction = DM.EAST; break;
+											case 3: mover.direction = DM.WEST; break;
+										}
+										mover.update_public({"direction": mover.direction})
+										break;
+									}
+								}
+							}
+						});
 					}
+					//
 				}
 			}
 		},

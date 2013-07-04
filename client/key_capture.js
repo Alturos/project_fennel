@@ -1,11 +1,18 @@
 // Dependant on client.js
 client.key_capture = {
 	key_state: {},
-	setup: function (){
-		window.onkeydown = function (e){ client.key_capture.key_press(e)};
-		window.onkeyup   = function (e){ client.key_capture.key_up(e)};
+	setup: function (configuration){
+		// See note in skin.js about tabindex and focus.
+		var container = client.skin.canvas;
+		container.addEventListener('keydown', function (event){
+			client.key_capture.key_press(event);
+		});
+		container.addEventListener('keyup', function (event){
+			client.key_capture.key_up(event);
+		});
 	},
 	key_press: function (e){
+		e.preventDefault();
 		var key_code;
 		if(window.event){ key_code = e.keyCode} // IE 8 and earlier compatibility.
 		else{
@@ -24,6 +31,7 @@ client.key_capture = {
 		}
 	},
 	key_up: function (e){
+		e.preventDefault();
 		var key_code;
 		if(window.event){ key_code = e.keyCode} // IE 8 and earlier compatibility.
 		else{

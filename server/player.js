@@ -1,10 +1,13 @@
 module.exports = (function (){
 	var DM = require('./DM.js');
 	var player = {
+		credential: undefined,
 		focused_mover: undefined,
 		unit: undefined,
 		attach_unit: function (unit){
 			this.unit = unit;
+			// TODO: Reexamine this assumption.
+			this.unit.revivable = true;
 		},
 		focus: function (mover){
 			this.focused_mover = mover;

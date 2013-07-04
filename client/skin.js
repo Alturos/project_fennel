@@ -2,10 +2,10 @@
 client.skin = {
 	setup: function (dom_container_id){
         var dom_container = document.getElementById(dom_container_id);
-        dom_container.style.background = "black";
-        dom_container.style.width = "100px";
-        dom_container.style.height= "100px";
         this.canvas = document.createElement('canvas');
+		// The following is a trick which makes any element focusable.
+		// Canvases normally are not focusable, so they cannot capture keyboard events.
+		this.canvas.setAttribute('tabindex', 1);
         this.canvas.width = SCREEN_WIDTH;
         this.canvas.height = SCREEN_HEIGHT;
         this.canvas.style.background = "black";
@@ -128,6 +128,8 @@ client.skin = {
 			var resource_image = resource.image;
 			var resource_offset_x = resource.x+offset_x;
 			var resource_offset_y = resource.y+offset_y;
+			var resource_width = resource.width || 16;
+			var resource_height = resource.height || 16;
 			if(invulnerable){
 				switch(Math.floor(Math.random()*3.99)){
 					case 0: {this.scrap_board.fillStyle = "rgb(255,   0,   0)"; break;}
@@ -138,12 +140,12 @@ client.skin = {
 				this.scrap_board.globalCompositeOperation = "copy";
 				this.scrap_board.fillRect(0, 0, this.scrap_board.canvas.width, this.scrap_board.canvas.height);
 				this.scrap_board.globalCompositeOperation = "destination-in";
-				this.scrap_board.drawImage(resource_image, (resource_offset_x)*16, (resource_offset_y)*16, 16, 16, 0, 0, 16, 16);
+				this.scrap_board.drawImage(resource_image, (resource_offset_x)*resource_width, (resource_offset_y)*resource_height, resource_width, resource_height, 0, 0, resource_width, resource_height);
 				resource_image = this.scrap_board.canvas;
 				resource_offset_x = 0;
 				resource_offset_y = 0;
 			}
-			this.context.drawImage(resource_image, (resource_offset_x)*16, (resource_offset_y)*16, 16, 16, x, y, 16, 16);
+			this.context.drawImage(resource_image, (resource_offset_x)*resource_width, (resource_offset_y)*resource_height, resource_width, resource_height, x, y, resource_width, resource_height);
 		}
 	}
 };

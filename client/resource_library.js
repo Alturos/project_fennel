@@ -1,4 +1,5 @@
 // Dependant on client.js
+var resource_path = '/rsc/fennel/'
 client.resource = function (identifier){
 	return this.resource_library.resource(identifier);
 }
@@ -12,20 +13,29 @@ client.resource_library = {
 	library: {
 		// I - Graphics
 		// I.a - Client Interface
-		"hud": {url: 'resources/graphics/hud.png', x:0, y:0},
-		"tomb": {url: 'resources/graphics/tomb.png', x:0, y:0, dirs: 1},
+		"hud": {url: resource_path + 'graphics/hud.png', x:0, y:0},
+		"tomb": {url: resource_path + 'graphics/tomb.png', x:0, y:0, dirs: 1},
 		// I.b - Tiles
-		"floor": {url: 'resources/graphics/plains.png', x:0, y:0},
-		"wall": {url: 'resources/graphics/plains.png', x:1, y:0},
-		"pillar": {url: 'resources/graphics/plains.png', x:2, y:0},
-		"water": {url: 'resources/graphics/plains.png', x:1, y:1},
-		"test": {url: 'resources/graphics/plains.png', x:1, y:1},
+		"floor": {url: resource_path + 'graphics/plains.png', x:0, y:0},
+		"pillar": {url: resource_path + 'graphics/plains.png', x:1, y:0},
+		"wall": {url: resource_path + 'graphics/plains.png', x:2, y:0},
+		"water": {url: resource_path + 'graphics/plains.png', x:1, y:1},
+		"test": {url: resource_path + 'graphics/plains.png', x:1, y:1},
 		// I.c - Units
-		"adventurer": {url: 'resources/graphics/adventurer.png', x:0, y:0, animate:2, dirs:4},
-		"archer": {url: 'resources/graphics/archer.png', x:0, y:0, animate:2, dirs:4},
-		"acolyte": {url: 'resources/graphics/acolyte.png', x:0, y:0, animate:2, dirs:4},
-		"knight": {url: 'resources/graphics/knight.png', x:0, y:0, animate:2, dirs:4},
-		"mage": {url: 'resources/graphics/mage.png', x:0, y:0, animate:2, dirs:4}
+		// I.c.1 - Player Classes
+		"adventurer": {url: resource_path + 'graphics/adventurer.png', x:0, y:0, animate:2, dirs:4},
+		"archer": {url: resource_path + 'graphics/archer.png', x:0, y:0, animate:2, dirs:4},
+		"acolyte": {url: resource_path + 'graphics/acolyte.png', x:0, y:0, animate:2, dirs:4},
+		"knight": {url: resource_path + 'graphics/knight.png', x:0, y:0, animate:2, dirs:4},
+		"mage": {url: resource_path + 'graphics/mage.png', x:0, y:0, animate:2, dirs:4},
+		// I.c.2 - Enemies
+		"bug1": {url: resource_path + 'graphics/enemies.png', x:0, y:0, animate:2, dirs:4},
+		"bug2": {url: resource_path + 'graphics/enemies.png', x:0, y:2, animate:2, dirs:4},
+		"bug3": {url: resource_path + 'graphics/enemies.png', x:4, y:0, animate:2, dirs:4},
+		// Projectiles and Effects
+		"fist": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:0, y:0, dirs: 4},
+		"fireball": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:4, y:0, animate:2, dirs: 4},
+		"shuriken": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:8, y:0, animate:3}
 	},
 	setup: function (callback){
 		console.log("Setting up resources");

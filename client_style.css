@@ -1,0 +1,44 @@
+#casual_quest{
+	height: 240px;
+}
+#casual_quest{
+	
+}
+#chat{
+	position: relative;
+	left: 0px;
+	top: 0px;
+	overflow: hidden;
+	display: inline-block;
+	width: 340px;
+	height: 240px;
+	border: inset 1px black;
+}
+#chat .output, #chat .input{
+	display: inline-block;
+	width: 100%;
+}
+#chat .output{
+	overflow-y: scroll;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+}
+#chat .input{
+	border-top: 2px ridge black;
+	position: absolute;
+	bottom: 0px;
+	left: 0px;
+}
+.chat_line .chat_byline{
+	font-weight: bold;
+	color: #630;
+}
+.chat_line .chat_byline:after{
+	content: ': ';
+	font-weight: normal;
+	color: grey;
+}
+.chat_line .chat_body{
+	color: black;
+}

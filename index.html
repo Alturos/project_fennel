@@ -4,20 +4,6 @@
 			<meta charset="UTF-8">
 			<title>Casual Quest</title>
 			<script src="/socket.io/socket.io.js"></script>
-			<!-- Server -->
-			<!--<script src="server/DM.js"></script>
-			<script src="server/game.js"></script>
-			<script src="server/id_manager.js"></script>
-			<script src="server/map.js"></script>
-			<script src="server/player.js"></script>
-			<script src="server/client.js"></script>
-			<script src="server/key_state.js"></script>
-			<script src="server/commandable.js"></script>
-			<script src="server/mover.js"></script>
-			<script src="server/unit.js"></script>
-			<script src="server/usable.js"></script>
-			<script src="server/projectile.js"></script>-->
-			<!-- Client -->
 			<script src="client/DM_client.js"></script>
 			<script src="client/environment_variables.js"></script>
 			<script src="client/client.js"></script>
@@ -27,17 +13,20 @@
 			<script src="client/skin.js"></script>
 			<script src="client/resource_library.js"></script>
 			<script src="client/unit_interface.js"></script>
+			<script src="client/chat.js"></script>
+			<link rel="stylesheet" href="client_style.css" />
 		</head>
 		<body>
-			<div id="casual_quest">
-			</div>
+			<div id="casual_quest"></div>
             <script>
 document.addEventListener("DOMContentLoaded", function (){
 	console.log("Remember to Edit the connection address in public/index.html")
 	var _conf = {
 		container_id: "casual_quest",
+		address: '127.0.0.1:7232',
+		email: persona_email
 		//address: "96.238.46.181:7232"
-		address: "http://localhost:7232/"
+		//address: "http://antlerpig.com:7232/"
 	}
 	client.preload(_conf);
 }, false );

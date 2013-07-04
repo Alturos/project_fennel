@@ -46,10 +46,9 @@ module.exports = (function (){
 				return indexed_node;
 			},
 			generate: function (){
-				console.log('Generating')
 				this.generate_node_grid();
 //				this.place_divisions();
-				this.log_nodes();
+//				this.log_nodes();
 //				this.log_divisions();
 			},
 			generate_node_grid: function (){
@@ -248,10 +247,9 @@ module.exports = (function (){
 					// A number between 1 and divisions_north
 				}*/
 				var screen_maze = Object.create(generator.maze);
-				var columns = Math.max(1, Math.ceil(Math.random()*4));
-				var rows = Math.max(1, Math.ceil(Math.random()*4));
+				var columns = Math.max(Math.ceil(Math.random()*2), Math.ceil(Math.random()*4));
+				var rows = Math.max(Math.ceil(Math.random()*2), Math.ceil(Math.random()*4));
 				screen_maze.setup(columns, rows, 0.5, 0.5);
-				console.log("Screen: ("+x+','+y+")")
 				screen_maze.generate();
 				//screen_maze.log_nodes();
 				/*
@@ -280,8 +278,6 @@ module.exports = (function (){
 					} else{
 						wall_y = false;
 					}
-					var line_log = '';
-					var fuckwad = ''
 					for(var pos_x = 0; pos_x < map.screen_width; pos_x++){
 						var test_index = boundries[columns-1].indexOf(pos_x);
 						if(test_index > -1){
@@ -291,19 +287,100 @@ module.exports = (function (){
 							wall_x = false;
 						}
 						var indexed_node = screen_maze.node(node_index_x, node_index_y);
-						fuckwad += ''+node_index_x+''+node_index_y;
 						var tile_character = '0';
-						if(wall_y && !(indexed_node.connections&DM.NORTH)){
-							tile_character = '2';
+						var horizontal_connectivity_check = false;
+						var vertical_connectivity_check = false;
+						if(pos_y == 0){
+							vertical_connectivity_check = true;
+							if(!(node.connections & DM.NORTH)){
+								tile_character = '1';
+							}
 						}
-						if(wall_x && !(indexed_node.connections&DM.WEST)){
-							tile_character = '2';
+						if(pos_y == map.screen_height-1){
+							vertical_connectivity_check = true;
+							if(!(node.connections & DM.SOUTH)){
+								tile_character = '1';
+							}
 						}
+						if(pos_x == 0){
+							horizontal_connectivity_check = true;
+							if(!(node.connections & DM.WEST)){
+								tile_character = '1';
+							}
+						}
+						if(pos_x == map.screen_width-1){
+							horizontal_connectivity_check = true;
+							if(!(node.connections & DM.EAST)){
+								tile_character = '1';
+							}
+						}
+						//
+						if(!vertical_connectivity_check){
+							if(wall_y && !(indexed_node.connections&DM.NORTH)){
+								tile_character = '1';
+							}
+						}
+						if(!horizontal_connectivity_check){
+							if(wall_x && !(indexed_node.connections&DM.WEST)){
+								tile_character = '1';
+							}
+						}
+						//
+						if(pos_y == 0 && node.connections & DM.NORTH){
+							var north_node = this.node(x, y-1);
+							if(north_node){
+								var mirror_index = ((map.screen_height-1)*map.screen_width) + pos_x;
+								var mirror_tile = north_node.tile_grid.charAt(mirror_index);
+								if(mirror_tile != '0' && tile_character == '0'){
+									tile_character = mirror_tile;
+								} else if(mirror_tile == '0' && tile_character != '0'){
+									var new_tile_grid = north_node.tile_grid.substr(0, mirror_index);
+									new_tile_grid += tile_character;
+									new_tile_grid += north_node.tile_grid.substr(mirror_index+1);
+									north_node.tile_grid =  new_tile_grid;
+								}
+							}
+						}
+						if(pos_x == 0 && node.connections & DM.WEST){
+							var west_node = this.node(x-1, y);
+							if(west_node){
+								var mirror_index = (pos_y*map.screen_width) + (map.screen_width-1);
+								var mirror_tile = west_node.tile_grid.charAt(mirror_index);
+								if(mirror_tile != '0' && tile_character == '0'){
+									tile_character = mirror_tile;
+								} else if(mirror_tile == '0' && tile_character != '0'){
+									var new_tile_grid = west_node.tile_grid.substr(0, mirror_index);
+									new_tile_grid += tile_character;
+									new_tile_grid += west_node.tile_grid.substr(mirror_index+1);
+									west_node.tile_grid =  new_tile_grid;
+								}
+							}
+						}
+						/*if(tile_character != 0){
+							if(pos_x == 0 && indexed_node.connections&DM.WEST){
+								var west_node = this.node(x-1, y);
+								if(west_node){
+									console.log('WEst node')
+									var compound_index = (pos_y*map.screen_width)+(map.screen_width-1);
+									var new_tile_grid = west_node.tile_grid.substr(0, compound_index);
+									new_tile_grid += tile_character;
+									new_tile_grid += west_node.tile_grid.substr(compound_index+1);
+									west_node.tile_grid = new_tile_grid;
+								}
+							}
+							if(pos_y == 0 && indexed_node.connections&DM.NORTH){
+								var north_node = this.node(x, y-1);
+								if(north_node){
+									var compound_index = ((map.screen_height-1)*map.screen_width)+pos_x;
+									var new_tile_grid = north_node.tile_grid.substr(0, compound_index);
+									new_tile_grid += tile_character;
+									new_tile_grid += north_node.tile_grid.substr(compound_index+1);
+									north_node.tile_grid = new_tile_grid;
+								}
+							}
+						}*/
 						tile_grid += tile_character;
-						line_log += tile_character
 					}
-					console.log(line_log)
-					//console.log(fuckwad)
 				}
 				node.tile_grid = tile_grid;
 			},

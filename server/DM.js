@@ -28,6 +28,7 @@ var DM = {
 	// Unit categorization:
 	M_HUMAN: 1,
 	F_PLAYER: 1,
+	F_ENEMY: 2,
 	// Movement logistics:
 	MOVEMENT_FLOOR: 1,
 	MOVEMENT_WATER: 2,

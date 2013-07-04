@@ -12,26 +12,8 @@ module.exports = (function (){
 		collision_check_priority: {value: DM.COLLISION_PRIORITY_UNIT, writable: true},
 		// Redefined Functions:
 		constructor: {value: function (x, y, screen){
-			switch(Math.floor(Math.random()*4)){
-				case 0:
-				case 4:
-					this.graphic = "knight"
-					this.faction = 1
-					break;
-				case 1:
-					this.graphic = "acolyte"
-					this.faction = 2
-					break;
-				case 2:
-					this.graphic = "mage"
-					this.faction = 4
-					break;
-				case 3:
-					this.graphic = "archer"
-					this.faction = 8
-					break;
-			}
 			// The above comes first because updated_public() is called with the graphic in mover.constructor
+			// 'above' code no longer exists. Leaving this here for now in case I need to know that graphic thing later.
 			Object.getPrototypeOf(unit).constructor.call(this, x, y, undefined, undefined, screen);
 			this.hp = this.base_body;
 			this.mp = this.base_aura;
@@ -57,11 +39,13 @@ module.exports = (function (){
 		dead: {value : false, writable: true},
 		hp: {value: 0, writable: true},
 		mp: {value: 0, writable: true},
+		revivable: {value: false, writable: true},
+		death_timer: {value: 0, writable: true},
 		faction: {value: DM.F_PLAYER, writable: true},
 		touch_damage: {value: 0, writable: true},
 		base_body: {value: 3, writable: true},
 		base_aura: {value: 1, writable: true},
-		base_speed: {value: 3},
+		base_speed: {value: 3, writable: true},
 		projectiles: {value: Object.create(DM.list), writable: true},
 		front_protection: {value: false, writable: true},
 		invulnerable_time: {value: 0, writable: true},
@@ -76,7 +60,12 @@ module.exports = (function (){
 			if(command & (DM.NORTH|DM.SOUTH|DM.EAST|DM.WEST)){
 				this.move(command, this.speed());
 			}
-			if(command & DM.SECONDARY){
+			if(command & DM.PRIMARY){
+				if(this.primary){
+					this.primary.use(this);
+				}
+			}
+			/*if(command & DM.SECONDARY){
 				var M = unit.constructor.call(Object.create(unit), 150, 150, this.screen);
 				M.touch_damage = 1;
 				M.intelligence_add({
@@ -109,12 +98,7 @@ module.exports = (function (){
 						}
 					}
 				});
-			}
-			if(command & DM.PRIMARY){
-				if(this.primary){
-					this.primary.use(this);
-				}
-			}
+			}*/
 		}},
 		augment: {value: function (identity, value){
 			/* Currently augmentable values:
@@ -161,7 +145,21 @@ module.exports = (function (){
 		}},
 		take_turn: {value: function (){
 			Object.getPrototypeOf(unit).take_turn.call(this);
-			if(this.dead){ return;}
+			if(this.dead){
+				if(--this.death_timer <= 0){
+					// TODO: Real Respawning
+					//this.dispose();
+					this.graphic = "adventurer";
+					this.invulnerable_time = 32;
+					this.dead = false;
+					this.adjust_hp(3);
+					this.update_public({
+						graphic: this.graphic,
+						invulnerable: this.invulnerable_time
+					})
+				}
+				return;
+			}
 			if(this.invulnerable_time){
 				this.invulnerable(-1);
 			}
@@ -257,16 +255,21 @@ module.exports = (function (){
 			}
 		}},
 		die: {value: function (){
-			console.log("dying");
-			this.dead = true;
-			this.graphic = "tomb";
-			this.invulnerable_time = 0;
-			this.update_public({
-				invulnerable: this.invulnerable_time,
-				dead: this.dead,
-				graphic: this.graphic
-			});
-			//this.dispose();
+			if(this.dead){ return}
+			if(this.revivable){
+				this.dead = true;
+				this.death_timer = 256;
+				this.graphic = "tomb";
+				this.invulnerable_time = 0;
+				this.update_public({
+					invulnerable: this.invulnerable_time,
+					dead: this.dead,
+					graphic: this.graphic
+				});
+				// TODO: Magic number!
+			} else{
+				this.dispose();
+			}
 		}},
 		invulnerable: {value: function (amount){
 			if(amount){
