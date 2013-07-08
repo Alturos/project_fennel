@@ -4,10 +4,27 @@ module.exports = (function (){
 		credential: undefined,
 		focused_mover: undefined,
 		unit: undefined,
+		intelligence: undefined, // TODO: In need of refactoring.
+		client_latency: 0,
 		attach_unit: function (unit){
 			this.unit = unit;
 			// TODO: Reexamine this assumption.
 			this.unit.revivable = true;
+		},
+		disconnect: function (){
+			if(this.intelligence){
+				this.intelligence.game.players.remove(this);
+			}
+			if(this.unit){
+				this.unit.intelligence_remove(this);
+				this.unit.dispose();
+				this.unit = undefined;
+			}
+			if(this.focused_mover){
+				this.focused_mover.intelligence_remove(this);
+				this.focused_mover = undefined;
+			}
+			this.intelligence = undefined;
 		},
 		focus: function (mover){
 			this.focused_mover = mover;
@@ -19,6 +36,12 @@ module.exports = (function (){
 		handle_event: function (mover, event){
 			switch(event.type){
 				case DM.EVENT_TAKE_TURN: {
+					if(!this.intelligence || !this.intelligence.connected){
+						if(++this.client_latency > 256){ // TODO: Magic numbers!
+							this.disconnect();
+						}
+						return
+					}
 					if(this.focused_mover && this.focused_mover.disposed){
 						this.focused_mover = undefined;
 					}
@@ -55,7 +78,11 @@ module.exports = (function (){
 			}
 		},
 		update_client: function (){
-			var screen = this.focused_mover.screen;
+			if(!this.intelligence || !this.intelligence.connected){
+				return;
+			}
+			this.client_latency = 0;
+			var screen = this.focused_mover? this.focused_mover.screen : undefined;
 			var update = {};
 			if(screen){
 				update.update = screen.updated;

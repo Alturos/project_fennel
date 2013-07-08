@@ -30,6 +30,7 @@ var DM = {
 	F_PLAYER: 1,
 	F_ENEMY: 2,
 	// Movement logistics:
+	MOVEMENT_STATIONARY: 0,
 	MOVEMENT_FLOOR: 1,
 	MOVEMENT_WATER: 2,
 	MOVEMENT_WALL : 4,
@@ -37,6 +38,7 @@ var DM = {
 	COLLISION_PRIORITY_MOVER: 0,
 	COLLISION_PRIORITY_UNIT: 1,
 	COLLISION_PRIORITY_PROJECTILE: 2,
+	COLLISION_PRIORITY_GROUND: 3,
 	EVENT_TAKE_TURN: 1,
 	EVENT_STOP: 2,
 	EVENT_SCREEN_CROSS: 3,
@@ -61,6 +63,8 @@ DM.list.add = function (){
 	}
 };
 DM.list.copy = function (){
-	return this.slice(0);
+	var new_list = Object.create(DM.list);
+	new_list.push.apply(new_list, this);
+	return new_list;
 }
 module.exports = DM;

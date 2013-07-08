@@ -241,6 +241,13 @@ module.exports = (function (){
 			}
 			return tile;
 		},
+		descend: function(mover, new_screen){
+			mover.update_public({"transition": true});
+			this.movers.remove(mover);
+			mover.screen = new_screen;
+			new_screen.movers.add(mover);
+			mover.handle_event(mover, {type: DM.EVENT_SCREEN_ENTER, screen_name: new_screen.name});
+		},
 		transition: function (mover, direction){
 			var new_screen = this.adjacent(direction, mover.x, mover.y)[0];
 			if(!new_screen){ return;}

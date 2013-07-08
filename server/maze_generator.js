@@ -2,6 +2,7 @@ module.exports = (function (){
 	//eller maze generator
 	var DM = require('./DM.js');
 	var map = require('./map.js');
+	var mover = require('./mover.js');
 	var generator = {
 		north: 1,
 		south: 2,
@@ -152,6 +153,21 @@ module.exports = (function (){
 					for(var pos_x = 0; pos_x < this.width; pos_x++){
 						var old_node = old_line[pos_x];
 						delete old_node.set;
+					}
+				}
+				for(var pos_y = 0; pos_y < this.height; pos_y++){
+					// Identify dead ends
+					for(var pos_x = 0; pos_x < this.width; pos_x++){
+						var test_node = this.node(pos_x, pos_y);
+						if(test_node.connections == DM.NORTH){
+							test_node.dead_end = DM.NORTH;
+						} else if(test_node.connections == DM.SOUTH){
+							test_node.dead_end = DM.SOUTH;
+						} else if(test_node.connections == DM.EAST){
+							test_node.dead_end = DM.EAST;
+						} else if(test_node.connections == DM.WEST){
+							test_node.dead_end = DM.WEST;
+						}
 					}
 				}
 			},
@@ -470,6 +486,7 @@ module.exports = (function (){
 			x: undefined,
 			y: undefined,
 			connections: 0,
+			dead_end: false,
 			divisions: 0,
 			tile_grid: undefined,
 			division: function (direction, divisions){
@@ -513,6 +530,6 @@ module.exports = (function (){
 				return new_division;
 			}
 		}
-	}
+	};
 	return generator;
 })();

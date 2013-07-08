@@ -3,7 +3,9 @@ module.exports = (function (){
 	var client = {
 		credential: undefined,
 		key_state: undefined,
+		connected: false,
 		setup: function (socket, connection_data){
+			this.connected = true;
 			this.key_state = Object.create(require('./key_state.js'));
 			this.socket = socket;
 			this.credential = connection_data.insecure_email;
@@ -11,6 +13,12 @@ module.exports = (function (){
 			socket.on('client_message', function (control_message) {
 				new_client.recieve_message(control_message);
 			});
+			socket.on('disconnect', function (){
+				new_client.disconnect();
+			});
+		},
+		disconnect: function (){
+			this.connected = false;
 		},
 		set_credential: function (new_credential){
 			this.credential = new_credential;

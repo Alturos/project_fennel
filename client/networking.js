@@ -7,6 +7,11 @@ client.networking = {
 			this.emit('setup', {
 				insecure_email: configuration.email
 			});
+			// Prevent message doubling
+			if(this.casual_quest_setup){
+				return;
+			}
+			this.casual_quest_setup = true;
 			this.on('update', function (message){
 				client.networking.recieve_message(message);
 			});

@@ -19,7 +19,7 @@ module.exports = (function (){
 		movement: {
 			value: DM.MOVEMENT_ALL,
 			writable : true
-			},
+		},
 		dense: {
 			value: false,
 			writable: true
@@ -262,7 +262,7 @@ module.exports = (function (){
 							break;
 						}
 					}
-				}
+				}	
 			}
 			this.y += delta_y;
 			if(delta_x || delta_y){
@@ -317,6 +317,9 @@ module.exports = (function (){
 			this.intelligences.unshift(new_intelligence);
 		}},
 		intelligence_remove: {value: function (old_intelligence){
+			if(!this.intelligences){
+				return;
+			}
 			this.intelligences.remove(old_intelligence);
 			if(!this.intelligences.length){
 				this.intelligences = null;

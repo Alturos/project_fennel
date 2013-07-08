@@ -1,5 +1,5 @@
 // Dependant on client.js
-var resource_path = '/rsc/fennel/'
+var resource_path = 'resources/'//'/rsc/fennel/'
 client.resource = function (identifier){
 	return this.resource_library.resource(identifier);
 }
@@ -15,12 +15,16 @@ client.resource_library = {
 		// I.a - Client Interface
 		"hud": {url: resource_path + 'graphics/hud.png', x:0, y:0},
 		"tomb": {url: resource_path + 'graphics/tomb.png', x:0, y:0, dirs: 1},
-		// I.b - Tiles
+		// I.b - Mapping
+		// I.b.1 - Tiles
 		"floor": {url: resource_path + 'graphics/plains.png', x:0, y:0},
 		"pillar": {url: resource_path + 'graphics/plains.png', x:1, y:0},
 		"wall": {url: resource_path + 'graphics/plains.png', x:2, y:0},
 		"water": {url: resource_path + 'graphics/plains.png', x:1, y:1},
 		"test": {url: resource_path + 'graphics/plains.png', x:1, y:1},
+		// I.b.2
+		"ladder_up": {url: resource_path + 'graphics/common_tall.png', x:1, y:0, height: 32},
+		"ladder_down": {url: resource_path + 'graphics/common_tall.png', x:0, y:0, height: 32, y_offset: -16},
 		// I.c - Units
 		// I.c.1 - Player Classes
 		"adventurer": {url: resource_path + 'graphics/adventurer.png', x:0, y:0, animate:2, dirs:4},

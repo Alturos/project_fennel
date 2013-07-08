@@ -30,6 +30,10 @@
 	bottom: 0px;
 	left: 0px;
 }
+.chat_line{
+	margin-left: 0.5em;
+	display: inline-block;
+}
 .chat_line .chat_byline{
 	font-weight: bold;
 	color: #630;
