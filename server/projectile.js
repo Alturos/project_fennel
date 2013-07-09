@@ -73,7 +73,6 @@ module.exports = (function (){
 					else if(this.vel.y < 0){ this.move(DM.SOUTH, Math.abs(this.vel.y));}
 					this.direction = old_dir;
 					var update_data = {
-						"graphic": this.graphic,
 						"x": this.x,
 						"y": this.y,
 						"direction": this.direction

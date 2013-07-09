@@ -34,6 +34,9 @@ client.skin = {
 			// The canvas can be accessed later via scrap_board.canvas
 		},
 		redraw: function (){
+			if(!client.screen){
+				return;
+			}
 			this.display_time++;
 			var screen = client.screen;
 			var focused_mover
@@ -61,7 +64,7 @@ client.skin = {
 				//putImageData(imgData,  x,  y, dirtyX,dirtyY,dirtyWidth,dirtyHeight);
 				for(var id in client.screen.movers){
 					var mover = client.screen.movers[id];
-					this.draw_graphic(mover.graphic, mover.x, mover.y, mover.direction, mover.invulnerable);
+					this.draw_graphic(mover.graphic, mover.state, mover.x, mover.y, mover.direction, mover.invulnerable);
 				}
 			}
 			if(client.focus_current && client.focus_current.display){
@@ -90,46 +93,92 @@ client.skin = {
 		},
 		draw_tile: function (tile, x, y, context){
 			var resource = client.resource(tile.graphic);
+			if(!resource){
+				console.log('No such resource: '+graphic)
+				return;
+			}
+			var state_name = tile.state;
 			//Canvas Draws from top to bottom. That is, the origin of the coordinate system corresponds with the top-left of the drawing plane.
 			//var fixed_y =
 			//context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
 			//                      s-prefix: subset of image.
-			context.drawImage(resource.image, resource.x*16, resource.y*16, 16, 16, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
-			//context.drawImage(graphic, x*TILE_SIZE, this.y(y*TILE_SIZE)-TILE_SIZE, TILE_SIZE, TILE_SIZE);
+			
+			var state = resource.states? resource.states[state_name] : undefined;
+			var sprite_x = resource.x || 0;
+			var sprite_y = resource.y || 0;
+			if(state){
+				if(state.x){
+					sprite_x += state.x * TILE_SIZE;
+				}
+				if(state.y){
+					sprite_y += state.y * TILE_SIZe;
+				}
+			}
+			context.drawImage(resource.image, sprite_x, sprite_y, TILE_SIZE, TILE_SIZE, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		},
-		draw_graphic: function (graphic, x, y, direction, invulnerable){
+		draw_graphic: function (graphic, state_name, x, y, direction, invulnerable){
 			// Beware MAGIC_NUMBERS!
 			var resource = client.resource(graphic);
+			if(!resource){
+				console.log('No such resource: '+graphic)
+				return;
+			}
+			var state = resource.states? resource.states[state_name] : undefined;
 			var offset_x = 0;
 			var offset_y = 0;
-			if(resource.dirs == 4){
+			var offset_width = resource.width || TILE_SIZE;
+			var offset_height = resource.height || TILE_SIZE;
+			var animate_frames = resource.animate || 1;
+			var offset_dirs = resource.dirs || 1;
+			if(state){
+				if(state.x){
+					offset_x += state.x;
+				}
+				if(state.y){
+					offset_y += state.y;
+				}
+				if(state.width){
+					offset_width = state.width;
+				}
+				if(state.height){
+					offset_height = state.height;
+				}
+				if(state.animate){
+					animate_frames = state.animate;
+				}
+				if(state.dirs){
+					offset_dirs = state.dirs;
+				}
+			}
+			if(offset_dirs == 4){
 				switch(direction){
 				case undefined:
 				break;
 				case DM.SOUTH:
 				break;
 				case DM.NORTH:
-					offset_x = 1;
+					offset_x += 1;
 				break;
 				case DM.EAST:
-					offset_x = 2;
+					offset_x += 2;
 				break;
 				case DM.WEST:
-					offset_x = 3;
+					offset_x += 3;
 				break;
 				}
 			}
-			if(!resource){
-				console.log('No such resource: '+graphic)
+			if(animate_frames){
+				offset_y += Math.floor(this.display_time/this.display_speed*6)%animate_frames;
 			}
-			if(resource.animate){
-				offset_y = Math.floor(this.display_time/this.display_speed*6)%resource.animate;
-			}
-			var resource_image = resource.image;
-			var resource_offset_x = resource.x+offset_x;
-			var resource_offset_y = resource.y+offset_y;
-			var resource_width = resource.width || 16;
-			var resource_height = resource.height || 16;
+			var sprite_image = resource.image;
+			//var resource_offset_x = resource.x+offset_x;
+			//var resource_offset_y = resource.y+offset_y;
+			//var resource_width = resource.width || 16;
+			//var resource_height = resource.height || 16;
+			var sprite_offset_x = (resource.x || 0) + (offset_x*offset_width);
+			var sprite_offset_y = (resource.y || 0) + (offset_y*offset_height);
+			var sprite_width = offset_width;
+			var sprite_height = offset_height;
 			if(invulnerable){
 				switch(Math.floor(Math.random()*3.99)){
 					case 0: {this.scrap_board.fillStyle = "rgb(255,   0,   0)"; break;}
@@ -140,12 +189,12 @@ client.skin = {
 				this.scrap_board.globalCompositeOperation = "copy";
 				this.scrap_board.fillRect(0, 0, this.scrap_board.canvas.width, this.scrap_board.canvas.height);
 				this.scrap_board.globalCompositeOperation = "destination-in";
-				this.scrap_board.drawImage(resource_image, (resource_offset_x)*resource_width, (resource_offset_y)*resource_height, resource_width, resource_height, 0, 0, resource_width, resource_height);
-				resource_image = this.scrap_board.canvas;
-				resource_offset_x = 0;
-				resource_offset_y = 0;
+				this.scrap_board.drawImage(sprite_image, sprite_offset_x, sprite_offset_y, sprite_width, sprite_height, 0, 0, sprite_width, sprite_height);
+				sprite_image = this.scrap_board.canvas;
+				sprite_offset_x = 0;
+				sprite_offset_y = 0;
 			}
-			this.context.drawImage(resource_image, (resource_offset_x)*resource_width, (resource_offset_y)*resource_height, resource_width, resource_height, x, y, resource_width, resource_height);
+			this.context.drawImage(sprite_image, sprite_offset_x, sprite_offset_y, sprite_width, sprite_height, x, y, sprite_width, sprite_height);
 		}
 	}
 };

@@ -125,7 +125,7 @@ module.exports = (function (){
 					var tile_count = this.grid_height*this.grid_width
 					if(tile_set_index == 0 && Math.random()*tile_count > tile_count - 5 && x!=0 && y!=0){
 						var monster_config = {
-							graphic: {value: 'bug1', writable: true},
+							_graphic: {value: 'bug1', writable: true},
 							faction: {value: DM.F_ENEMY},
 							touch_damage: {value: 1},
 							base_speed: {value: 1},
@@ -464,9 +464,11 @@ module.exports = (function (){
 	};
 	map.tile = {
 		graphic: undefined,
+		state: undefined,
 		movement: DM.MOVEMENT_ALL,
-		constructor: function (graphic, movement){
+		constructor: function (graphic, state, movement){
 			this.graphic = graphic || this.graphic;
+			this.state = state || this.state;
 			this.movement = movement || this.movement;
 			return this;
 		},

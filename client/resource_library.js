@@ -17,13 +17,15 @@ client.resource_library = {
 		"tomb": {url: resource_path + 'graphics/tomb.png', x:0, y:0, dirs: 1},
 		// I.b - Mapping
 		// I.b.1 - Tiles
-		"floor": {url: resource_path + 'graphics/plains.png', x:0, y:0},
-		"pillar": {url: resource_path + 'graphics/plains.png', x:1, y:0},
-		"wall": {url: resource_path + 'graphics/plains.png', x:2, y:0},
-		"water": {url: resource_path + 'graphics/plains.png', x:1, y:1},
-		"test": {url: resource_path + 'graphics/plains.png', x:1, y:1},
+		"plains": {url: resource_path + 'graphics/plains.png', states: {
+			"floor": {url: resource_path + 'graphics/plains.png', x:0, y:0},
+			"pillar": {url: resource_path + 'graphics/plains.png', x:1, y:0},
+			"wall": {url: resource_path + 'graphics/plains.png', x:2, y:0},
+			"water": {url: resource_path + 'graphics/plains.png', x:1, y:1},
+			"test": {url: resource_path + 'graphics/plains.png', x:1, y:1},
+		}},
 		// I.b.2
-		"ladder_up": {url: resource_path + 'graphics/common_tall.png', x:1, y:0, height: 32},
+		"ladder_up": {url: resource_path + 'graphics/common_tall.png', x:16, y:0, height: 32},
 		"ladder_down": {url: resource_path + 'graphics/common_tall.png', x:0, y:0, height: 32, y_offset: -16},
 		// I.c - Units
 		// I.c.1 - Player Classes
@@ -34,12 +36,12 @@ client.resource_library = {
 		"mage": {url: resource_path + 'graphics/mage.png', x:0, y:0, animate:2, dirs:4},
 		// I.c.2 - Enemies
 		"bug1": {url: resource_path + 'graphics/enemies.png', x:0, y:0, animate:2, dirs:4},
-		"bug2": {url: resource_path + 'graphics/enemies.png', x:0, y:2, animate:2, dirs:4},
-		"bug3": {url: resource_path + 'graphics/enemies.png', x:4, y:0, animate:2, dirs:4},
+		"bug2": {url: resource_path + 'graphics/enemies.png', x:0, y:32, animate:2, dirs:4},
+		"bug3": {url: resource_path + 'graphics/enemies.png', x:64, y:0, animate:2, dirs:4},
 		// Projectiles and Effects
 		"fist": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:0, y:0, dirs: 4},
-		"fireball": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:4, y:0, animate:2, dirs: 4},
-		"shuriken": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:8, y:0, animate:3}
+		"fireball": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:32, y:0, animate:2, dirs: 4},
+		"shuriken": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:64, y:0, animate:3}
 	},
 	setup: function (callback){
 		console.log("Setting up resources");

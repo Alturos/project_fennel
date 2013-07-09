@@ -15,10 +15,10 @@ module.exports = (function (){
 				var new_level = map.region.constructor.call(Object.create(map.region), this.id+' level '+depth, 64, 64);
 				new_level.depth = depth;
 				var shared_tile_set = [
-					map.tile.constructor.call(Object.create(map.tile), "floor", DM.MOVEMENT_FLOOR),
-					map.tile.constructor.call(Object.create(map.tile), "wall", DM.MOVEMENT_WALL),
-					map.tile.constructor.call(Object.create(map.tile), "pillar", DM.MOVEMENT_WALL),
-					map.tile.constructor.call(Object.create(map.tile), "water", DM.MOVEMENT_WATER)
+					map.tile.constructor.call(Object.create(map.tile), 'plains', "floor", DM.MOVEMENT_FLOOR),
+					map.tile.constructor.call(Object.create(map.tile), 'plains', "wall", DM.MOVEMENT_WALL),
+					map.tile.constructor.call(Object.create(map.tile), 'plains', "pillar", DM.MOVEMENT_WALL),
+					map.tile.constructor.call(Object.create(map.tile), 'plains', "water", DM.MOVEMENT_WATER)
 				];
 				var level_maze = maze_generator.generate_maze();
 				var dead_ends = Object.create(DM.list);
@@ -51,7 +51,7 @@ module.exports = (function (){
 		}
 	}
 	var passage_up = Object.create(mover, {
-		graphic: {value: 'ladder_up'},
+		_graphic: {value: 'ladder_up'},
 		movement: {value: DM.MOVEMENT_STATIONARY},
 		width: {value: map.tile_size},
 		height: {value: map.tile_size},
@@ -64,7 +64,7 @@ module.exports = (function (){
 		}}
 	});
 	var passage_down = Object.create(mover, {
-		graphic: {value: 'ladder_down'},
+		_graphic: {value: 'ladder_down'},
 		movement: {value: DM.MOVEMENT_STATIONARY},
 		width: {value: map.tile_size},
 		height: {value: map.tile_size},

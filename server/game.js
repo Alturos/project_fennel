@@ -100,23 +100,23 @@ module.exports = (function (){
 		spawn_unit: function (player){
 			var first_level = this.dungeon.get_level(1);
 			var unit_config = {
-				graphic: {value: 'acolyte', writable: true},
+				_graphic: {value: 'acolyte', writable: true},
 				faction: {value: 1},
 				revivable: {value: true}
 			};
 			switch(Math.floor(Math.random()*4)){
 			case 0:
 			case 4:
-				unit_config.graphic.value = "knight"
+				unit_config._graphic.value = "knight"
 			break;
 			case 1:
-				unit_config.graphic.value = "acolyte"
+				unit_config._graphic.value = "acolyte"
 			break;
 			case 2:
-				unit_config.graphic.value = "mage"
+				unit_config._graphic.value = "mage"
 			break;
 			case 3:
-				unit_config.graphic.value = "archer"
+				unit_config._graphic.value = "archer"
 			break;
 			}
 			var start_screen = first_level.start_screen
@@ -128,7 +128,7 @@ module.exports = (function (){
 			new_mover.primary.effect = "asdf";
 			if(!this.fist_projectile){
 				this.fist_projectile = Object.create(game.projectile, {
-					graphic: {value: 'fist', writable: true},
+					_graphic: {value: 'fist', writable: true},
 					width: {value: 8},
 					height: {value: 8},
 					max_range: {value: 16},

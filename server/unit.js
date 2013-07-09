@@ -6,7 +6,7 @@ module.exports = (function (){
 		// Redefined Values:
 		width: {value: map.tile_size, writable: true},
 		height: {value: map.tile_size, writable: true},
-		graphic: {value: "adventurer", writable: true},
+		_graphic: {value: "adventurer", writable: true},
 		dense: {value: true, writable: true},
 		movement: {value: DM.MOVEMENT_FLOOR, writable: true},
 		collision_check_priority: {value: DM.COLLISION_PRIORITY_UNIT, writable: true},
@@ -147,18 +147,7 @@ module.exports = (function (){
 			Object.getPrototypeOf(unit).take_turn.call(this);
 			if(this.dead){
 				if(--this.death_timer <= 0){
-					// TODO: Real Respawning
 					this.dispose();
-					/*
-					this.graphic = "adventurer";
-					this.invulnerable_time = 32;
-					this.dead = false;
-					this.adjust_hp(3);
-					this.update_public({
-						graphic: this.graphic,
-						invulnerable: this.invulnerable_time
-					})
-					*/
 				}
 				return;
 			}
@@ -265,8 +254,7 @@ module.exports = (function (){
 				this.invulnerable_time = 0;
 				this.update_public({
 					invulnerable: this.invulnerable_time,
-					dead: this.dead,
-					graphic: this.graphic
+					dead: this.dead
 				});
 				// TODO: Magic number!
 			} else{

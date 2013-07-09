@@ -12,9 +12,20 @@ module.exports = (function (){
 			value     : false,
 			writable  : true
 		},
-		screen: {
+		_screen: {
 			value     : undefined,
 			writable  : true
+		},
+		screen: {
+			set: function (value){
+				this._screen = value;
+				this.update_public({
+					graphic: this._graphic
+				});
+			},
+			get: function (){
+				return this._screen;
+			}
 		},
 		movement: {
 			value: DM.MOVEMENT_ALL,
@@ -36,9 +47,20 @@ module.exports = (function (){
 			value     : DM.SOUTH,
 			writable  : true
 		},
-		graphic: {
+		_graphic:{
 			value: "test",
-			writable  : true
+			writable  : true,
+		},
+		graphic: {
+			set: function (value){
+				this._graphic = value;
+				this.update_public({
+					graphic: this._graphic
+				});
+			},
+			get: function (){
+				return this._graphic;
+			}
 		},
 		width: {
 			value: map.tile_size,
@@ -109,7 +131,7 @@ module.exports = (function (){
 		update_public: { value: function (data){
 			if(this.disposed){ return}
 			if(!this.updated_public){
-				this.updated_public = {"id": this.id, "graphic": this.graphic};
+				this.updated_public = {"id": this.id/*, "graphic": this.graphic*/};
 			}
 			for(var key in data){
 				this.updated_public[key] = data[key];
