@@ -10,6 +10,9 @@ client.key_capture = {
 		container.addEventListener('keyup', function (event){
 			client.key_capture.key_up(event);
 		});
+		container.addEventListener('blur', function (event){
+			client.key_capture.flush()
+		}, true);
 	},
 	key_press: function (e){
 		e.preventDefault();
@@ -53,6 +56,6 @@ client.key_capture = {
 			var command = client.preferences[key];
 			client.focus_current.command((command|DM.KEY_UP));
 		}
-		key_state = {};
+		this.key_state = {};
 	}
 }
