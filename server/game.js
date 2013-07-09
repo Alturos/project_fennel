@@ -67,51 +67,7 @@ module.exports = (function (){
 			new_player.intelligence = new_client;
 			if(!old_player){
 				this.players.add(new_player);
-				var first_level = this.dungeon.get_level(1);
-				var unit_config = {
-					graphic: {value: 'acolyte', writable: true},
-					faction: {value: 1},
-					revivable: {value: true}
-				};
-				switch(Math.floor(Math.random()*4)){
-				case 0:
-				case 4:
-					unit_config.graphic.value = "knight"
-				break;
-				case 1:
-					unit_config.graphic.value = "acolyte"
-				break;
-				case 2:
-					unit_config.graphic.value = "mage"
-				break;
-				case 3:
-					unit_config.graphic.value = "archer"
-				break;
-				}
-				var start_screen = first_level.start_screen
-				var new_mover = this.unit.constructor.call(Object.create(this.unit, unit_config), 32, 32, start_screen);
-				new_mover.hp = new_mover.max_hp();
-				new_mover.mp = new_mover.max_mp()-1;
-				new_mover.intelligence_add(new_player);
-				new_mover.primary = Object.create(this.usable);
-				new_mover.primary.effect = "asdf";
-				if(!this.fist_projectile){
-					this.fist_projectile = Object.create(game.projectile, {
-						graphic: {value: 'fist', writable: true},
-						width: {value: 8},
-						height: {value: 8},
-						max_range: {value: 16},
-						speed: {value: 4},
-						potency: {value: 1}
-					});
-				}
-				var fist_projectile = this.fist_projectile;
-				new_mover.primary["asdf"] = (function (user){
-					var M = game.projectile.constructor.call(Object.create(fist_projectile), new_mover, null);
-				});
-				new_client.send_message({"screen": first_level.start_screen.pack()})
-				new_player.attach_unit(new_mover);
-				new_player.focus(new_mover);
+				this.spawn_unit(new_player);
 			} else{
 				var new_mover = old_player.focused_mover;
 				new_player.focus(new_mover);
@@ -140,6 +96,53 @@ module.exports = (function (){
 				var player = this.players[I];
 				player.update_client();
 			}
+		},
+		spawn_unit: function (player){
+			var first_level = this.dungeon.get_level(1);
+			var unit_config = {
+				graphic: {value: 'acolyte', writable: true},
+				faction: {value: 1},
+				revivable: {value: true}
+			};
+			switch(Math.floor(Math.random()*4)){
+			case 0:
+			case 4:
+				unit_config.graphic.value = "knight"
+			break;
+			case 1:
+				unit_config.graphic.value = "acolyte"
+			break;
+			case 2:
+				unit_config.graphic.value = "mage"
+			break;
+			case 3:
+				unit_config.graphic.value = "archer"
+			break;
+			}
+			var start_screen = first_level.start_screen
+			var new_mover = this.unit.constructor.call(Object.create(this.unit, unit_config), 32, 32, start_screen);
+			new_mover.hp = new_mover.max_hp();
+			new_mover.mp = new_mover.max_mp()-1;
+			new_mover.intelligence_add(player);
+			new_mover.primary = Object.create(this.usable);
+			new_mover.primary.effect = "asdf";
+			if(!this.fist_projectile){
+				this.fist_projectile = Object.create(game.projectile, {
+					graphic: {value: 'fist', writable: true},
+					width: {value: 8},
+					height: {value: 8},
+					max_range: {value: 16},
+					speed: {value: 4},
+					potency: {value: 1}
+				});
+			}
+			var fist_projectile = this.fist_projectile;
+			new_mover.primary["asdf"] = (function (user){
+				var M = game.projectile.constructor.call(Object.create(fist_projectile), new_mover, null);
+			});
+			player.intelligence.send_message({"screen": first_level.start_screen.pack()})
+			player.attach_unit(new_mover);
+			player.focus(new_mover);
 		}
 	};
 	return game;

@@ -70,6 +70,10 @@ module.exports = (function (){
 					}
 					break;
 				}
+				case DM.EVENT_DISPOSE: {
+					// TODO: Better game referencing :/
+					this.intelligence.game.spawn_unit(this);
+				}
 			}
 		},
 		command: function(command){

@@ -96,6 +96,7 @@ module.exports = (function (){
 			return this;
 		}},
 		dispose: { value: function(){
+			this.handle_event(this, {type: DM.EVENT_DISPOSE});
 			this.update_public({"dispose":true})
 			// Recycle must go after update_public(), as this.id is needed in update_public().
 			id_manager.recycle_id(this);

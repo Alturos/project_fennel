@@ -148,7 +148,8 @@ module.exports = (function (){
 			if(this.dead){
 				if(--this.death_timer <= 0){
 					// TODO: Real Respawning
-					//this.dispose();
+					this.dispose();
+					/*
 					this.graphic = "adventurer";
 					this.invulnerable_time = 32;
 					this.dead = false;
@@ -157,6 +158,7 @@ module.exports = (function (){
 						graphic: this.graphic,
 						invulnerable: this.invulnerable_time
 					})
+					*/
 				}
 				return;
 			}
