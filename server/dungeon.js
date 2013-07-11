@@ -61,6 +61,9 @@ module.exports = (function (){
 			return this;
 		}},
 		collide: { value: function (mover){
+			if(mover.faction != DM.F_PLAYER){
+				return;
+			}
 		}}
 	});
 	var passage_down = Object.create(mover, {
@@ -74,7 +77,10 @@ module.exports = (function (){
 			return this;
 		}},
 		collide: { value: function (mover){
-			console.log('Going Down')
+			if(mover.faction != DM.F_PLAYER){
+				return;
+			}
+			console.log('Going Down');
 			var next_level = dungeon.get_level(map.regions[this.screen.region_id].depth+1);
 			var start_screen = next_level.start_screen;
 			this.screen.descend(mover, start_screen);
