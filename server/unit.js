@@ -267,14 +267,15 @@ module.exports = (function (){
 					if(this.invulnerable_time > 0){
 						this.invulnerable_time = Math.max(this.invulnerable_time + amount, 0);
 						if(this.invulnerable_time == 0){
-							this.update_public({invulnerable: false});
+							this.update_public({invulnerable: this.invulnerable_time});
 						}
 					}
 				} else if(this.invulnerable_time){
 					this.invulnerable_time = Math.max(this.invulnerable_time, amount);
+					this.update_public({invulnerable: this.invulnerable_time});
 				} else{
 					this.invulnerable_time = amount;
-					this.update_public({invulnerable: true});
+					this.update_public({invulnerable: this.invulnerable_time});
 				}
 			}
 			return this.invulnerable_time;

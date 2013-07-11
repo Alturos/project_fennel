@@ -156,7 +156,6 @@ module.exports = (function (){
 											case 2: mover.direction = DM.EAST; break;
 											case 3: mover.direction = DM.WEST; break;
 										}
-										mover.update_public({"direction": mover.direction})
 										break;
 									}
 								}
@@ -247,6 +246,9 @@ module.exports = (function (){
 			mover.screen = new_screen;
 			new_screen.movers.add(mover);
 			mover.handle_event(mover, {type: DM.EVENT_SCREEN_ENTER, screen_name: new_screen.name});
+			if((typeof mover.invulnerable) == 'function'){
+				mover.invulnerable(DM.INVULNERABLE_TIME*2);
+			}
 		},
 		transition: function (mover, direction){
 			var new_screen = this.adjacent(direction, mover.x, mover.y)[0];
@@ -255,6 +257,9 @@ module.exports = (function (){
 			this.movers.remove(mover);
 			mover.screen = new_screen;
 			new_screen.movers.add(mover);
+			if((typeof mover.invulnerable) == 'function'){
+				mover.invulnerable(DM.INVULNERABLE_TIME);
+			}
 			switch(direction){
 				case DM.NORTH: {
 					mover.y = (new_screen.grid_height * map.tile_size) - mover.height;

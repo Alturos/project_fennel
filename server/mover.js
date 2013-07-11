@@ -43,9 +43,20 @@ module.exports = (function (){
 			value     : undefined,
 			writable  : true
 		},
-		direction: {
+		_direction: {
 			value     : DM.SOUTH,
 			writable  : true
+		},
+		direction: {
+			set: function (value){
+				this._direction = value;
+				this.update_public({
+					direction: this._direction
+				});
+			},
+			get: function (){
+				return this._direction;
+			}
 		},
 		_graphic:{
 			value: "test",
@@ -149,7 +160,7 @@ module.exports = (function (){
 				"graphic": this.graphic,
 				"x": this.x,
 				"y": this.y,
-				"direction": this.direction
+				"direction": this.direction,
 			}
 			return update_data;
 		}},
@@ -326,9 +337,6 @@ module.exports = (function (){
 				if(this.x == 0){
 					this.handle_event(this, {type: DM.EVENT_SCREEN_CROSS, direction: DM.WEST});
 				}
-			}
-			if(old_dir != this.direction){
-				this.update_public({"direction": this.direction});
 			}
 			return this.translate(delta_x, delta_y);
 		}},
