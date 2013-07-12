@@ -35,6 +35,9 @@ module.exports = (function (){
 			value: false,
 			writable: true
 		},
+		persistent: {
+			value: false
+		},
 		faction: {
 			value: DM.F_NONE,
 			writable: true
@@ -59,7 +62,7 @@ module.exports = (function (){
 			}
 		},
 		_graphic:{
-			value: "test",
+			value: undefined,
 			writable  : true,
 		},
 		graphic: {
@@ -71,6 +74,21 @@ module.exports = (function (){
 			},
 			get: function (){
 				return this._graphic;
+			}
+		},
+		_graphic_state:{
+			value: undefined,
+			writable  : true,
+		},
+		graphic_state: {
+			set: function (value){
+				this._graphic_state = value;
+				this.update_public({
+					graphic_state: this._graphic_state
+				});
+			},
+			get: function (){
+				return this._graphic_state;
 			}
 		},
 		width: {
@@ -94,6 +112,11 @@ module.exports = (function (){
 				var int_copy = this.intelligences.copy()
 				for(var I = 0; I < int_copy.length; I++){
 					var next_intelligence = int_copy[I];
+					if(!next_intelligence){ continue;}
+					if(next_intelligence.disposed){
+						this.intelligence_remove(next_intelligence);
+						continue;
+					}
 					if(this.intelligences.indexOf(next_intelligence) == -1){ continue;}
 					var result = next_intelligence.handle_event(mover, event);
 					if(!result){
@@ -113,7 +136,7 @@ module.exports = (function (){
 			this.height = height || this.height;
 			if(screen){
 				this.screen = screen;
-				screen.movers.add(this);
+				screen.add_mover(this);
 				/*var test_loc = this.screen.tile_at(this.x, this.y);
 				if(test_loc){
 					test_loc.add_mover(this);

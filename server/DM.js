@@ -25,6 +25,7 @@ var DM = {
 	GAME_SPEED: 1000/25,
 	STATE_SETUP: 1,
 	STATE_STARTED: 2,
+	SCREEN_DEACTIVATION_TIME: 1024,
 	// Unit categorization:
 	M_HUMAN: 1,
 	F_PLAYER: 1,

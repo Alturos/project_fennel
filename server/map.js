@@ -51,6 +51,7 @@ module.exports = (function (){
 		grid_height: 16,
 		constructor: function (id, width, height){
 			this.id = id;
+			map.regions[this.id] = this;
 			this.grid_width  = width  || this.grid_width ;
 			this.grid_height = height || this.grid_height;
 			this.active_screens = Object.create(DM.list);
@@ -64,7 +65,6 @@ module.exports = (function (){
 			return this.screen_grid[compound_index];
 		},
 		place_screen: function(screen){
-			this.active_screens.add(screen);
 			screen.region_id = this.id;
 			for(var pos_y = 0; pos_y < screen.screens_height; pos_y++){
 				if(pos_y + screen.x >= this.grid_height){ continue;}
@@ -83,12 +83,18 @@ module.exports = (function (){
 				if(!screen || this.screen_grid.indexOf(screen) == -1){
 					continue;
 				}
+				if(!screen.active){
+					this.active_screens.remove(screen);
+					continue;
+				}
 				screen.iterate();
 			}
 		}
 	}
 	map.screen = {
 		disposed: false,
+		active: false,
+		peaceful_time: 0,
 		tile_set: undefined,
 		region_id: undefined,
 		screens_width: 1,
@@ -115,54 +121,11 @@ module.exports = (function (){
 		setup: function (tile_map){
 			this.tile_grid.length = (this.screens_width*map.screen_width)*(this.screens_height*map.screen_height);
 			if(!tile_map){tile_map = '';}
-			var unit = require('./unit.js'); // This here to prevent circular reference before either map or unit are finished.
 			for(var y = 0; y < this.grid_height; y++){
 				for(var x = 0; x < this.grid_width; x++){
 					var compound_index = y*this.grid_width + x;
 					var tile_set_index = parseInt(tile_map.charAt(compound_index));
 					this.tile_grid[compound_index] = tile_set_index;
-					// TODO: replace this monster placement.
-					var tile_count = this.grid_height*this.grid_width
-					if(tile_set_index == 0 && Math.random()*tile_count > tile_count - 5 && x!=0 && y!=0){
-						var monster_config = {
-							_graphic: {value: 'bug1', writable: true},
-							faction: {value: DM.F_ENEMY},
-							touch_damage: {value: 1},
-							base_speed: {value: 1},
-							base_body: {value: 1}
-						}
-						var M = unit.constructor.call(Object.create(unit, monster_config), x*16, y*16, this);
-						M.intelligence_add({
-							handle_event: function (mover, event){
-								if(mover.dead){ return;}
-								switch(event.type){
-									case DM.EVENT_TAKE_TURN: {
-										var new_dir = mover.direction;
-										if(Math.random()*16 < 1){
-											switch(Math.floor(Math.random()*10)){
-												case 0: new_dir = DM.NORTH; break;
-												case 1: new_dir = DM.SOUTH; break;
-												case 2: new_dir = DM.EAST; break;
-												case 3: new_dir = DM.WEST; break;
-											}
-										}
-										mover.move(new_dir, mover.speed())
-										break;
-									}
-									case DM.EVENT_STOP: {
-										switch(Math.floor(Math.random()*4)){
-											case 0: mover.direction = DM.NORTH; break;
-											case 1: mover.direction = DM.SOUTH; break;
-											case 2: mover.direction = DM.EAST; break;
-											case 3: mover.direction = DM.WEST; break;
-										}
-										break;
-									}
-								}
-							}
-						});
-					}
-					//
 				}
 			}
 		},
@@ -244,10 +207,16 @@ module.exports = (function (){
 			mover.update_public({"transition": true});
 			this.movers.remove(mover);
 			mover.screen = new_screen;
-			new_screen.movers.add(mover);
+			new_screen.add_mover(mover);
 			mover.handle_event(mover, {type: DM.EVENT_SCREEN_ENTER, screen_name: new_screen.name});
 			if((typeof mover.invulnerable) == 'function'){
 				mover.invulnerable(DM.INVULNERABLE_TIME*2);
+			}
+		},
+		add_mover: function (movers){
+			this.movers.add(movers);
+			if(!this.active){
+				this.activate();
 			}
 		},
 		transition: function (mover, direction){
@@ -256,7 +225,7 @@ module.exports = (function (){
 			mover.update_public({"transition": true});
 			this.movers.remove(mover);
 			mover.screen = new_screen;
-			new_screen.movers.add(mover);
+			new_screen.add_mover(mover);
 			if((typeof mover.invulnerable) == 'function'){
 				mover.invulnerable(DM.INVULNERABLE_TIME);
 			}
@@ -329,13 +298,33 @@ module.exports = (function (){
 		iterate: function (){
 			if(this.disposed){ return;}
 			this.updated = false;
+			var hostility = false;
+			var active_faction;
 			var movers_copy = this.movers.copy();
 			for(var I = 0; I < movers_copy.length; I++){
 				var mover = movers_copy[I];
+				if(!hostility){
+					if(mover.faction == DM.F_PLAYER){
+						hostility = true;
+					} else if(!active_faction){
+						active_faction = mover.faction;
+					} else if(active_faction != mover.faction){
+						hostility = true;
+					}
+				}
 				if(this.movers.indexOf(mover) == -1){
 					continue;
 				}
 				mover.take_turn()
+			}
+			if(!hostility){
+				this.peaceful_time++
+				if(this.peaceful_time >= DM.SCREEN_DEACTIVATION_TIME){
+					this.deactivate();
+					return;
+				}
+			} else{
+				peaceful_time = 0;
 			}
 			movers_copy = this.movers.copy();
 			for(var I = 0; I < movers_copy.length; I++){
@@ -465,6 +454,80 @@ module.exports = (function (){
 				this.updated = Object.create(DM.list);
 			}
 			this.updated.add(data);
+		},
+		activate: function (){
+			if(this.active == true){
+				return;
+			}
+			this.active = true;
+			var parent_region = map.regions[this.region_id];
+			parent_region.active_screens.add(this);
+			this.populate(parent_region.depth, parent_region.theme);
+		},
+		deactivate: function (){
+			if(!this.active){
+				return;
+			}
+			this.active = false;
+			this.peaceful_time = 0;
+			for(var mover_index = 0; mover_index < this.movers.length; mover_index++){
+				var indexed_mover = this.movers[mover_index];
+				if(indexed_mover.persistent){
+					continue;
+				}
+				indexed_mover.dispose();
+			}
+			var parent_region = map.regions[this.region_id];
+			parent_region.active_screens.remove(this);
+		},
+		populate: function (depth, theme){
+			var unit = require('./unit.js'); // This here to prevent circular reference before either map or unit are finished.// TODO: replace this monster placement.
+			var monster_config = {
+				_graphic: {value: 'bug1', writable: true},
+				faction: {value: DM.F_ENEMY},
+				touch_damage: {value: 1},
+				base_speed: {value: 1},
+				base_body: {value: 1}
+			};
+			var monster_intel = {
+				handle_event: function (mover, event){
+					if(mover.dead){ return;}
+					switch(event.type){
+						case DM.EVENT_TAKE_TURN: {
+							var new_dir = mover.direction;
+							if(Math.random()*16 < 1){
+								switch(Math.floor(Math.random()*10)){
+									case 0: new_dir = DM.NORTH; break;
+									case 1: new_dir = DM.SOUTH; break;
+									case 2: new_dir = DM.EAST; break;
+									case 3: new_dir = DM.WEST; break;
+								}
+							}
+							mover.move(new_dir, mover.speed())
+							break;
+						}
+						case DM.EVENT_STOP: {
+							switch(Math.floor(Math.random()*4)){
+								case 0: mover.direction = DM.NORTH; break;
+								case 1: mover.direction = DM.SOUTH; break;
+								case 2: mover.direction = DM.EAST; break;
+								case 3: mover.direction = DM.WEST; break;
+							}
+							break;
+						}
+					}
+				}
+			};
+			var tile_count = this.grid_height*this.grid_width;
+			for(var y = 0; y < this.grid_height; y++){
+				for(var x = 0; x < this.grid_width; x++){
+					var test_tile = this.locate(x, y);
+					if((test_tile.movement&DM.MOVEMENT_FLOOR) && Math.random()*tile_count > tile_count - 5 && x!=0 && y!=0){
+						var M = unit.constructor.call(Object.create(unit, monster_config), x*16, y*16, this);
+						M.intelligence_add(monster_intel);
+					}
+				}
+			}
 		}
 	};
 	map.tile = {

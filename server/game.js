@@ -133,12 +133,36 @@ module.exports = (function (){
 					height: {value: 8},
 					max_range: {value: 16},
 					speed: {value: 4},
-					potency: {value: 1}
+					potency: {value: 1},
+					constructor: {value: function (user, skill){
+						game.projectile.constructor.call(this, user, skill);
+						user.intelligence_add(this);
+						return this;
+					}},
+					dispose: {value: function (){
+						if(this.owner && this.owner._graphic_state == 'attack'){
+							this.owner.graphic_state = null;
+						}
+						game.projectile.dispose.call(this);
+					}},
+					handle_event: {value: function (controlled_mover, event){
+						if(controlled_mover == this){
+							return game.projectile.handle_event.call(this, controlled_mover, event);
+						}
+						switch(event.type){
+						case DM.EVENT_TAKE_TURN:
+							if(controlled_mover._graphic_state != 'attack'){
+								controlled_mover.graphic_state = 'attack';
+							}
+							return false;
+						}
+						return true;
+					}}
 				});
 			}
 			var fist_projectile = this.fist_projectile;
 			new_mover.primary["asdf"] = (function (user){
-				var M = game.projectile.constructor.call(Object.create(fist_projectile), new_mover, null);
+				user.shoot(fist_projectile); //var M = game.projectile.constructor.call(Object.create(fist_projectile), new_mover, null);
 			});
 			player.intelligence.send_message({"screen": first_level.start_screen.pack()})
 			player.attach_unit(new_mover);

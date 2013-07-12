@@ -64,7 +64,7 @@ client.skin = {
 				//putImageData(imgData,  x,  y, dirtyX,dirtyY,dirtyWidth,dirtyHeight);
 				for(var id in client.screen.movers){
 					var mover = client.screen.movers[id];
-					this.draw_graphic(mover.graphic, mover.state, mover.x, mover.y, mover.direction, mover.invulnerable);
+					this.draw_graphic(mover.graphic, mover.graphic_state, mover.x, mover.y, mover.direction, mover.invulnerable);
 				}
 			}
 			if(client.focus_current && client.focus_current.display){
@@ -124,6 +124,10 @@ client.skin = {
 				return;
 			}
 			var state = resource.states? resource.states[state_name] : undefined;
+			if(state_name){
+				console.log("State Name: "+state_name)
+				console.log(resource.states)
+			}
 			var offset_x = 0;
 			var offset_y = 0;
 			var offset_width = resource.width || TILE_SIZE;
@@ -131,6 +135,7 @@ client.skin = {
 			var animate_frames = resource.animate || 1;
 			var offset_dirs = resource.dirs || 1;
 			if(state){
+				console.log("Drawing State")
 				if(state.x){
 					offset_x += state.x;
 				}

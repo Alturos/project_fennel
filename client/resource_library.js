@@ -29,11 +29,21 @@ client.resource_library = {
 		"ladder_down": {url: resource_path + 'graphics/common_tall.png', x:0, y:0, height: 32, y_offset: -16},
 		// I.c - Units
 		// I.c.1 - Player Classes
-		"adventurer": {url: resource_path + 'graphics/adventurer.png', x:0, y:0, animate:2, dirs:4},
-		"archer": {url: resource_path + 'graphics/archer.png', x:0, y:0, animate:2, dirs:4},
-		"acolyte": {url: resource_path + 'graphics/acolyte.png', x:0, y:0, animate:2, dirs:4},
-		"knight": {url: resource_path + 'graphics/knight.png', x:0, y:0, animate:2, dirs:4},
-		"mage": {url: resource_path + 'graphics/mage.png', x:0, y:0, animate:2, dirs:4},
+		"adventurer": {url: resource_path + 'graphics/adventurer.png', x:0, y:0, animate:2, dirs:4, states: {
+			"attack": {x:0, y:2, animate:1, dirs:4}
+		}},
+		"archer": {url: resource_path + 'graphics/archer.png', x:0, y:0, animate:2, dirs:4, states: {
+			"attack": {x:0, y:2, animate:1, dirs:4}
+		}},
+		"acolyte": {url: resource_path + 'graphics/acolyte.png', x:0, y:0, animate:2, dirs:4, states: {
+			"attack": {x:0, y:2, animate:1, dirs:4}
+		}},
+		"knight": {url: resource_path + 'graphics/knight.png', x:0, y:0, animate:2, dirs:4, states: {
+			"attack": {x:0, y:2, animate:1, dirs:4}
+		}},
+		"mage": {url: resource_path + 'graphics/mage.png', x:0, y:0, animate:2, dirs:4, states: {
+			"attack": {x:0, y:2, animate:1, dirs:4}
+		}},
 		// I.c.2 - Enemies
 		"bug1": {url: resource_path + 'graphics/enemies.png', x:0, y:0, animate:2, dirs:4},
 		"bug2": {url: resource_path + 'graphics/enemies.png', x:0, y:32, animate:2, dirs:4},

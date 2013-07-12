@@ -55,6 +55,7 @@ module.exports = (function (){
 		movement: {value: DM.MOVEMENT_STATIONARY},
 		width: {value: map.tile_size},
 		height: {value: map.tile_size},
+		persistent: {value: true},
 		collision_check_priority: {value: DM.COLLISION_PRIORITY_GROUND},
 		constructor: { value: function (x, y, screen){
 			mover.constructor.call(this, x*map.tile_size, y*map.tile_size, this.width, this.height, screen);
@@ -71,6 +72,7 @@ module.exports = (function (){
 		movement: {value: DM.MOVEMENT_STATIONARY},
 		width: {value: map.tile_size},
 		height: {value: map.tile_size},
+		persistent: {value: true},
 		collision_check_priority: {value: DM.COLLISION_PRIORITY_GROUND},
 		constructor: { value: function (x, y, screen){
 			mover.constructor.call(this, x*map.tile_size, y*map.tile_size, this.width, this.height, screen);
@@ -80,7 +82,6 @@ module.exports = (function (){
 			if(mover.faction != DM.F_PLAYER){
 				return;
 			}
-			console.log('Going Down');
 			var next_level = dungeon.get_level(map.regions[this.screen.region_id].depth+1);
 			var start_screen = next_level.start_screen;
 			this.screen.descend(mover, start_screen);

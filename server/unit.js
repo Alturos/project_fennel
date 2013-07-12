@@ -189,12 +189,15 @@ module.exports = (function (){
 					}
 				}
 			}*/
-		/*
-		shoot(){
-			if(projectile_type){
-				new projectile_type(src)
-				}
-			}*/
+		shoot: {value: function (projectile_model){
+			if(!projectile_model){
+				projectile_model = this.projectile_model
+			}
+			if(!projectile_model){
+				return;
+			}
+			projectile_model.constructor.call(Object.create(projectile_model), this, null);
+		}},
 		adjust_hp: {value: function (amount){
 			var old_health = this.hp;
 			this.hp += amount;
@@ -443,7 +446,7 @@ module.exports = (function (){
 				case DM.EVENT_SCREEN_ENTER: {}
 			}
 			return true;
-		},
+		}
 	};
 	return unit;
 })();
