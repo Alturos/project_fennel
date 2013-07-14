@@ -27,9 +27,11 @@ module.exports = (function (){
 			}
 		break;
 		case DM.DIED:
-			var centered_x = mover.x + Math.floor((mover.width -item.width )/2);
-			var centered_y = mover.y + Math.floor((mover.height-item.height)/2);
-			var I = item.constructor.call(Object.create(item), centered_x, centered_y, undefined, undefined, this.screen);
+			if(Math.random() > 3/4){
+				var centered_x = mover.x + Math.floor((mover.width -item.width )/2);
+				var centered_y = mover.y + Math.floor((mover.height-item.height)/2);
+				var I = item.constructor.call(Object.create(item), centered_x, centered_y, undefined, undefined, this.screen);
+			}
 		break;
 		}
 	}

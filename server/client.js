@@ -18,6 +18,21 @@ module.exports = (function (){
 			});
 		},
 		disconnect: function (){
+			// TODO: This is a terrible hack of a way to add traffic, but it's just for the demo.
+			for(var client_index = 0; client_index < this.game.players.length; client_index++){
+				var indexed_player = this.game.players[client_index];
+				if(!indexed_player){ continue}
+				var indexed_client = indexed_player.intelligence;
+				if(!indexed_client){ continue}
+				var chat_message = {
+					user: "traffic",
+					body: this.resolve_credential(this.credential)+' has disconnected.'
+				}
+				indexed_client.send_message({
+					chat: [chat_message]
+				})
+			}
+			//
 			this.connected = false;
 		},
 		set_credential: function (new_credential){
@@ -25,7 +40,8 @@ module.exports = (function (){
 		},
 		resolve_credential: function (){
 			if(!this.credential){
-				return 'Guest';
+				this.credential = 'Guest'+Math.floor(Math.random()*9000+1000);
+				return this.credential;
 			}
 			return this.credential;
 		},

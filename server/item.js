@@ -6,8 +6,9 @@ module.exports = (function (){
 		width: {value: 8},
 		height: {value: 8},
 		_graphic: {value: 'items'},
-		_graphic_state: {value: 'coin_silver'},
+		_graphic_state: {value: 'cherry', writable: true},
 		collision_check_priority: {value: DM.COLLISION_PRIORITY_GROUND},
+		life_span: {value: DM.ITEM_TIME, writable: true},
 		collide: { value: function (mover){
 			if(mover.faction != DM.F_PLAYER){
 				return;
@@ -21,6 +22,15 @@ module.exports = (function (){
 					this.dispose();
 				}
 			}
+		}},
+		take_turn: { value: function(){
+			if(this.disposed){
+				return;
+			}
+			if(--this.life_span < 0){
+				this.dispose();
+			}
+			return mover.take_turn.call(this);
 		}}
 	});
 	return item;

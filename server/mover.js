@@ -143,6 +143,7 @@ module.exports = (function (){
 			}
 			var update_data = {
 				"graphic": this.graphic,
+				"graphic_state": this.graphic_state,
 				"x": this.x,
 				"y": this.y,
 				"direction": this.direction

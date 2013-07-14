@@ -26,6 +26,7 @@ var DM = {
 	STATE_SETUP: 1,
 	STATE_STARTED: 2,
 	SCREEN_DEACTIVATION_TIME: 1024,
+	ITEM_TIME: 256,
 	// Unit categorization:
 	M_HUMAN: 1,
 	F_PLAYER: 1,
