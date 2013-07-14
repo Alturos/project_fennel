@@ -6,7 +6,7 @@ module.exports = (function (){
 		collision_check_priority: {
 			value: DM.COLLISION_PRIORITY_UNIT,
 			writable: true
-			},
+		},
 		movement: {
 			value: DM.MOVEMENT_FLOOR | DM.MOVEMENT_WATER,
 			writable: true
@@ -17,7 +17,7 @@ module.exports = (function (){
 		},
 		// Redefined Functions:
 		constructor: {value: function (owner, skill){
-			Object.getPrototypeOf(projectile).constructor.call(this, undefined, undefined, undefined, undefined, owner.screen);
+			mover.constructor.call(this, undefined, undefined, undefined, undefined, owner.screen);
 			this.vel = {x:0, y:0};
 			//var center_loc = function (target, center){
 			this.x = owner.x + (owner.width  - this.width )/2;
@@ -41,7 +41,8 @@ module.exports = (function (){
 			return this;
 		}},
 		behavior_name: {value: "behavior", writable: true},
-		behavior: {value: function (event){
+		behavior: {value: function (mover, event){
+			if(mover != this){ return false;}
 			switch(event.type){
 				case DM.EVENT_TAKE_TURN: {
 					if(this.max_range){

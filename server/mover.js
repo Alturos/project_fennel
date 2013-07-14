@@ -124,12 +124,11 @@ module.exports = (function (){
 					}
 				}
 			} else if(this.behavior_name && this[this.behavior_name]){
-				this[this.behavior_name].call(mover, event);
+				this[this.behavior_name].call(this, mover, event);
 			}
 		}},
 		constructor: { value: function (x, y, width, height, screen){
 			id_manager.generate_id(this);
-			//this.color = "rgba("+Math.round(Math.random()*255)+","+Math.round(Math.random()*255)+","+Math.round(Math.random()*255)+", 1.0)";
 			this.x = x || undefined;
 			this.y = y || undefined;
 			this.width  = width  || this.width;
@@ -180,7 +179,8 @@ module.exports = (function (){
 		pack_public: { value: function (){
 			if(this.disposed){ return false}
 			var update_data = {
-				"graphic": this.graphic,
+				"graphic": this._graphic,
+				"graphic_state": this._graphic_state,
 				"x": this.x,
 				"y": this.y,
 				"direction": this.direction,

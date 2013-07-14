@@ -18,11 +18,25 @@ client.resource_library = {
 		// I.b - Mapping
 		// I.b.1 - Tiles
 		"plains": {url: resource_path + 'graphics/plains.png', states: {
-			"floor": {url: resource_path + 'graphics/plains.png', x:0, y:0},
-			"pillar": {url: resource_path + 'graphics/plains.png', x:1, y:0},
-			"wall": {url: resource_path + 'graphics/plains.png', x:2, y:0},
-			"water": {url: resource_path + 'graphics/plains.png', x:1, y:1},
-			"test": {url: resource_path + 'graphics/plains.png', x:1, y:1},
+			"floor": {x:0, y:0},
+			"pillar": {x:1, y:0},
+			"wall": {x:2, y:0},
+			"water": {x:1, y:1},
+			"test": {x:1, y:1},
+		}},
+		"cave": {url: resource_path + 'graphics/cave.png', states: {
+			"floor": {x:0, y:0},
+			"pillar": {x:1, y:0},
+			"wall": {x:2, y:0},
+			"water": {x:1, y:1},
+			"test": {x:1, y:1},
+		}},
+		"castle": {url: resource_path + 'graphics/castle.png', states: {
+			"floor": {x:0, y:0},
+			"pillar": {x:1, y:0},
+			"wall": {x:2, y:0},
+			"water": {x:1, y:1},
+			"test": {x:1, y:1},
 		}},
 		// I.b.2
 		"ladder_up": {url: resource_path + 'graphics/common_tall.png', x:16, y:0, height: 32},
@@ -48,6 +62,18 @@ client.resource_library = {
 		"bug1": {url: resource_path + 'graphics/enemies.png', x:0, y:0, animate:2, dirs:4},
 		"bug2": {url: resource_path + 'graphics/enemies.png', x:0, y:32, animate:2, dirs:4},
 		"bug3": {url: resource_path + 'graphics/enemies.png', x:64, y:0, animate:2, dirs:4},
+		// I.d - Items
+		// I.d.1 - Droppable Items
+		"items": {url: resource_path + 'graphics/items.png', width: 8, height: 8, states: {
+			"cherry":       {},
+			"plum":         {x:1, y:0},
+			"bottle":       {x:2, y:0},
+			"shield":       {x:3, y:0, animate: 2},
+			"coin_silver":  {x:0, y:1, animate: 4},
+			"coin_gold":    {x:1, y:1, animate: 4},
+			"coin_diamond": {x:2, y:1, animate: 4},
+			"bomb_lit":     {x:3, y:2, animate: 2}
+		}},
 		// Projectiles and Effects
 		"fist": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:0, y:0, dirs: 4},
 		"fireball": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:32, y:0, animate:2, dirs: 4},

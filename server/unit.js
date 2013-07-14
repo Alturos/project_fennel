@@ -14,7 +14,7 @@ module.exports = (function (){
 		constructor: {value: function (x, y, screen){
 			// The above comes first because updated_public() is called with the graphic in mover.constructor
 			// 'above' code no longer exists. Leaving this here for now in case I need to know that graphic thing later.
-			Object.getPrototypeOf(unit).constructor.call(this, x, y, undefined, undefined, screen);
+			mover.constructor.call(this, x, y, undefined, undefined, screen);
 			this.hp = this.base_body;
 			this.mp = this.base_aura;
 			return this;
@@ -24,7 +24,7 @@ module.exports = (function (){
 				var projectile = this.projectiles[I]
 				projectile.dispose()
 			}
-			Object.getPrototypeOf(unit).dispose.call(this);
+			mover.dispose.call(this);
 		}},
 		collide: {value: function (mover){
 			if(this.dead){ return};
@@ -144,7 +144,7 @@ module.exports = (function (){
 			return this.augment("speed", this.base_speed);
 		}},
 		take_turn: {value: function (){
-			Object.getPrototypeOf(unit).take_turn.call(this);
+			mover.take_turn.call(this);
 			if(this.dead){
 				if(--this.death_timer <= 0){
 					this.dispose();
@@ -250,6 +250,7 @@ module.exports = (function (){
 		}},
 		die: {value: function (){
 			if(this.dead){ return}
+			this.handle_event(this, DM.EVENT_DIED);
 			if(this.revivable){
 				this.dead = true;
 				this.death_timer = 256;

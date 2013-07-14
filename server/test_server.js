@@ -3,7 +3,7 @@ var socketio = require('socket.io');
 var connect = require('connect');
 
 var configuration = {
-	http_port: 7231,
+	http_port: 80,
 	socket_port: 7232
 };
 

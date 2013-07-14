@@ -14,11 +14,15 @@ module.exports = (function (){
 			if(depth > this.levels.length || !this.levels[level_index]){
 				var new_level = map.region.constructor.call(Object.create(map.region), this.id+' level '+depth, 64, 64);
 				new_level.depth = depth;
+				var region_graphic = 'cave';
+				if(depth == 1){
+					region_graphic = 'plains';
+				}
 				var shared_tile_set = [
-					map.tile.constructor.call(Object.create(map.tile), 'plains', "floor", DM.MOVEMENT_FLOOR),
-					map.tile.constructor.call(Object.create(map.tile), 'plains', "wall", DM.MOVEMENT_WALL),
-					map.tile.constructor.call(Object.create(map.tile), 'plains', "pillar", DM.MOVEMENT_WALL),
-					map.tile.constructor.call(Object.create(map.tile), 'plains', "water", DM.MOVEMENT_WATER)
+					map.tile.constructor.call(Object.create(map.tile), region_graphic, "floor", DM.MOVEMENT_FLOOR),
+					map.tile.constructor.call(Object.create(map.tile), region_graphic, "wall", DM.MOVEMENT_WALL),
+					map.tile.constructor.call(Object.create(map.tile), region_graphic, "pillar", DM.MOVEMENT_WALL),
+					map.tile.constructor.call(Object.create(map.tile), region_graphic, "water", DM.MOVEMENT_WATER)
 				];
 				var level_maze = maze_generator.generate_maze();
 				var dead_ends = Object.create(DM.list);

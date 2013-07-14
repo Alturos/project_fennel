@@ -308,7 +308,7 @@ module.exports = (function (){
 						hostility = true;
 					} else if(!active_faction){
 						active_faction = mover.faction;
-					} else if(active_faction != mover.faction){
+					} else if(mover.faction && active_faction != mover.faction){
 						hostility = true;
 					}
 				}
@@ -481,50 +481,19 @@ module.exports = (function (){
 			parent_region.active_screens.remove(this);
 		},
 		populate: function (depth, theme){
+			var unit_library = require('./unit_library.js');
 			var unit = require('./unit.js'); // This here to prevent circular reference before either map or unit are finished.// TODO: replace this monster placement.
-			var monster_config = {
-				_graphic: {value: 'bug1', writable: true},
-				faction: {value: DM.F_ENEMY},
-				touch_damage: {value: 1},
-				base_speed: {value: 1},
-				base_body: {value: 1}
-			};
-			var monster_intel = {
-				handle_event: function (mover, event){
-					if(mover.dead){ return;}
-					switch(event.type){
-						case DM.EVENT_TAKE_TURN: {
-							var new_dir = mover.direction;
-							if(Math.random()*16 < 1){
-								switch(Math.floor(Math.random()*10)){
-									case 0: new_dir = DM.NORTH; break;
-									case 1: new_dir = DM.SOUTH; break;
-									case 2: new_dir = DM.EAST; break;
-									case 3: new_dir = DM.WEST; break;
-								}
-							}
-							mover.move(new_dir, mover.speed())
-							break;
-						}
-						case DM.EVENT_STOP: {
-							switch(Math.floor(Math.random()*4)){
-								case 0: mover.direction = DM.NORTH; break;
-								case 1: mover.direction = DM.SOUTH; break;
-								case 2: mover.direction = DM.EAST; break;
-								case 3: mover.direction = DM.WEST; break;
-							}
-							break;
-						}
-					}
-				}
-			};
+			var random_units = ['bug1', 'bug1', 'bug1', 'bug2', 'bug2', 'bug3'];
+			var random_model_id;
+			var unit_model;
 			var tile_count = this.grid_height*this.grid_width;
 			for(var y = 0; y < this.grid_height; y++){
 				for(var x = 0; x < this.grid_width; x++){
 					var test_tile = this.locate(x, y);
+					random_model_id = random_units[Math.floor(Math.random()*random_units.length)];
+					unit_model = unit_library.model_get(random_model_id);
 					if((test_tile.movement&DM.MOVEMENT_FLOOR) && Math.random()*tile_count > tile_count - 5 && x!=0 && y!=0){
-						var M = unit.constructor.call(Object.create(unit, monster_config), x*16, y*16, this);
-						M.intelligence_add(monster_intel);
+						var M = unit.constructor.call(Object.create(unit_model), x*16, y*16, this);
 					}
 				}
 			}
