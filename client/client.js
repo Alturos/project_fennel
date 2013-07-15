@@ -42,5 +42,22 @@ var client = {
 				}
 			}
 		}
+	},
+	transition: function (new_screen){
+		var transition_direction = 0;
+		if(client.screen && new_screen.region_id == client.screen.region_id){
+			if(new_screen.x == client.screen.x+1){
+				transition_direction |= DM.EAST;
+			} else if(new_screen.x == client.screen.x-1){
+				transition_direction |= DM.WEST;
+			}
+			if(new_screen.y == client.screen.y+1){
+				transition_direction |= DM.NORTH;
+			} else if(new_screen.y == client.screen.y-1){
+				transition_direction |= DM.SOUTH;
+			}
+		}
+		client.skin.screen.transition(transition_direction);
+		client.screen = new_screen;
 	}
 };

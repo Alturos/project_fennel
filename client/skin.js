@@ -20,6 +20,16 @@ client.skin = {
 		display_time: 0,
 		display_speed: 1000/24,
 		screen_background: undefined,
+		transition_storage: (function (){
+			var transition_canvas = document.createElement('canvas');
+			return {
+				canvas: undefined,
+				//context: undefined,
+				time_left: 0,
+				full_time: 24,
+				direction: undefined
+			};
+		})(),
 		setup: function (context, width, height){
 			context.imageSmoothingEnabled = false;
 			context.webkitImageSmoothingEnabled = false;
@@ -40,6 +50,34 @@ client.skin = {
 			this.display_time++;
 			var screen = client.screen;
 			var focused_mover
+			var transitioning = false;
+			var transition_offset_x = 0;
+			var transition_offset_y = 0;
+			var full_offset_x = 0;
+			var full_offset_y = 0;
+			if(this.transition_storage.time_left){
+				transitioning = true;
+				this.transition_storage.time_left--;
+				ty = function (factor){
+					return (Math.sin((Math.PI)*(factor-0.5))+1)/2
+				}
+				var transition_percent = this.transition_storage.time_left / this.transition_storage.full_time;
+				var parametric_percent = ty(transition_percent);
+				if(this.transition_storage.direction == DM.EAST){
+					transition_offset_x =  Math.round(((screen.width -1)*TILE_SIZE) * parametric_percent);
+					full_offset_x       =  Math.round( (screen.width -1)*TILE_SIZE);
+				} else if(this.transition_storage.direction == DM.WEST){
+					transition_offset_x = -Math.round(((screen.width -1)*TILE_SIZE) * parametric_percent);
+					full_offset_x       = -Math.round( (screen.width -1)*TILE_SIZE);
+				}
+				if(this.transition_storage.direction == DM.NORTH){
+					transition_offset_y =  Math.round(((screen.height-1)*TILE_SIZE) * parametric_percent);
+					full_offset_y       =  Math.round( (screen.height-1)*TILE_SIZE);
+				} else if(this.transition_storage.direction == DM.SOUTH){
+					transition_offset_y = -Math.round(((screen.height-1)*TILE_SIZE) * parametric_percent);
+					full_offset_y       = -Math.round( (screen.height-1)*TILE_SIZE);
+				}
+			}
 			if(client.focused_mover_id){
 				focused_mover = client.screen.movers[client.focused_mover_id]
 			}
@@ -47,8 +85,8 @@ client.skin = {
 				client.eye = [focused_mover.x, focused_mover.y];
 			}
 			if(client.eye){
-				var x_offset = Math.max(0, Math.min((screen.width *TILE_SIZE)-1 -this.width , client.eye[0]-Math.round(this.width /2)))
-				var y_offset = Math.max(0, Math.min((screen.height*TILE_SIZE)-1 -this.height, client.eye[1]-Math.round(this.height/2)))
+				var x_offset = Math.max(0, Math.min((screen.width *TILE_SIZE)-1 -this.width , client.eye[0]-Math.round(this.width /2)));
+				var y_offset = Math.max(0, Math.min((screen.height*TILE_SIZE)-1 -this.height, client.eye[1]-Math.round(this.height/2)));
 				this.context.setTransform(1, 0, 0, 1, -x_offset, -y_offset)
 				if(!(client.screen.drawn)){
 					this.context.clearRect(0,0, client.skin.canvas.width, client.skin.canvas.height);
@@ -59,12 +97,42 @@ client.skin = {
 				if(-y_offset < 0){ console.log("Problem!: "+y_offset)}*/
 				var draw_width  = Math.min(this.width , this.screen_background.width );
 				var draw_height = Math.min(this.height, this.screen_background.height);
-				this.context.drawImage(this.screen_background, x_offset, y_offset, draw_width, draw_height, x_offset, y_offset, draw_width, draw_height)//, -x_offset, -y_offset, x_offset, y_offset, this.width, this.height)
+				if(this.transition_storage.time_left){
+					this.context.drawImage(
+						this.transition_storage.canvas,
+						x_offset,
+						y_offset,
+						draw_width,
+						draw_height,
+						-full_offset_x+transition_offset_x,
+						-full_offset_y+transition_offset_y,
+						draw_width,
+						draw_height
+					);
+				};
+				this.context.drawImage(
+					this.screen_background,
+					x_offset,
+					y_offset,
+					draw_width,
+					draw_height,
+					x_offset+transition_offset_x,
+					y_offset+transition_offset_y,
+					draw_width,
+					draw_height
+				);
+				//, -x_offset, -y_offset, x_offset, y_offset, this.width, this.height)
 				   //drawImage(image  , sx, sy, sWidth, this.height, dx, dy, dWidth, dHeight)
-				//putImageData(imgData,  x,  y, dirtyX,dirtyY,dirtyWidth,dirtyHeight);
 				for(var id in client.screen.movers){
 					var mover = client.screen.movers[id];
-					this.draw_graphic(mover.graphic, mover.graphic_state, mover.x, mover.y, mover.direction, mover.invulnerable);
+					this.draw_graphic(
+						mover.graphic,
+						mover.graphic_state,
+						mover.x+transition_offset_x,
+						mover.y+transition_offset_y,
+						mover.direction,
+						mover.invulnerable && !transitioning
+					);
 				}
 			}
 			if(client.focus_current && client.focus_current.display){
@@ -195,6 +263,16 @@ client.skin = {
 				sprite_offset_y = 0;
 			}
 			this.context.drawImage(sprite_image, sprite_offset_x, sprite_offset_y, sprite_width, sprite_height, x, y, sprite_width, sprite_height);
+		},
+		transition: function (direction){
+			if(!direction){ return;}
+			this.transition_storage.canvas = this.screen_background;
+			if(!this.transition_storage.time_left && DM.flip(direction) == this.transition_storage.direction){
+				this.transition_storage.time_left = this.transition_storage.full_time;
+			} else{
+				this.transition_storage.time_left = this.transition_storage.full_time - this.transition_storage.time_left;
+			}
+			this.transition_storage.direction = direction;
 		}
 	}
 };

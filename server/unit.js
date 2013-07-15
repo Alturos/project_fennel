@@ -45,7 +45,7 @@ module.exports = (function (){
 		touch_damage: {value: 0, writable: true},
 		base_body: {value: 3, writable: true},
 		base_aura: {value: 1, writable: true},
-		base_speed: {value: 3, writable: true},
+		base_speed: {value: 2, writable: true},
 		projectiles: {value: Object.create(DM.list), writable: true},
 		front_protection: {value: false, writable: true},
 		invulnerable_time: {value: 0, writable: true},

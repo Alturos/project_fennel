@@ -166,11 +166,14 @@ module.exports = (function (){
 				mover_package[mover.id] = individual_pack;
 			}
 			var pack = {
+				"region_id": this.region_id,
 				"tile_set": this.tile_set,
 				"width": this.grid_width,
 				"height": this.grid_height,
 				"grid": this.tile_grid,
-				"movers": mover_package
+				"movers": mover_package,
+				"x": this.x,
+				"y": this.y
 			};
 			return pack;
 		},
@@ -210,7 +213,7 @@ module.exports = (function (){
 			new_screen.add_mover(mover);
 			mover.handle_event(mover, {type: DM.EVENT_SCREEN_ENTER, screen_name: new_screen.name});
 			if((typeof mover.invulnerable) == 'function'){
-				mover.invulnerable(DM.INVULNERABLE_TIME*2);
+				mover.invulnerable(DM.TRANSITION_INVULNERABILITY_TIME*2);
 			}
 		},
 		add_mover: function (movers){
@@ -227,7 +230,7 @@ module.exports = (function (){
 			mover.screen = new_screen;
 			new_screen.add_mover(mover);
 			if((typeof mover.invulnerable) == 'function'){
-				mover.invulnerable(DM.INVULNERABLE_TIME);
+				mover.invulnerable(DM.TRANSITION_INVULNERABILITY_TIME);
 			}
 			switch(direction){
 				case DM.NORTH: {

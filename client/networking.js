@@ -37,7 +37,8 @@ client.networking = {
 					break;
 				}
 				case "screen": {
-					client.screen = data[key];
+					client.transition(data[key]);
+					//client.screen = data[key];
 					redraw = true;
 					break;
 				}
