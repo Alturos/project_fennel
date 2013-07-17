@@ -162,7 +162,7 @@ client.skin = {
 		draw_tile: function (tile, x, y, context){
 			var resource = client.resource(tile.graphic);
 			if(!resource){
-				console.log('No such resource: '+graphic)
+				console.log('No such resource: '+tile.graphic)
 				return;
 			}
 			var state_name = tile.state;
@@ -265,7 +265,12 @@ client.skin = {
 			this.context.drawImage(sprite_image, sprite_offset_x, sprite_offset_y, sprite_width, sprite_height, x, y, sprite_width, sprite_height);
 		},
 		transition: function (direction){
-			if(!direction){ return;}
+			if(!direction){
+				if(this.transition_storage.time_left){
+					this.transition_storage.time_left = 0;
+				}
+				return;
+			}
 			this.transition_storage.canvas = this.screen_background;
 			if(!this.transition_storage.time_left && DM.flip(direction) == this.transition_storage.direction){
 				this.transition_storage.time_left = this.transition_storage.full_time;

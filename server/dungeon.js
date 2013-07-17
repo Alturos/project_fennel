@@ -3,6 +3,7 @@ module.exports = (function (){
 	var map = require('./map.js');
 	var mover = require('./mover.js');
 	var maze_generator = require('./maze_generator.js');
+	var model_library = require('./model_library.js');
 	var dungeon = {
 		id: 'Test Dungeon',
 		levels: [], // list of regions
@@ -12,17 +13,18 @@ module.exports = (function (){
 			}
 			var level_index = depth-1;
 			if(depth > this.levels.length || !this.levels[level_index]){
-				var new_level = map.region.constructor.call(Object.create(map.region), this.id+' level '+depth, 64, 64);
-				new_level.depth = depth;
-				var region_graphic = 'cave';
+				var theme_id = 'cave';
 				if(depth == 1){
-					region_graphic = 'plains';
+					theme_id = 'plains';
 				}
+				var new_level = map.region.constructor.call(Object.create(map.region), this.id+' level '+depth, theme_id, 64, 64);
+				new_level.depth = depth;
+				var floor_theme = new_level.theme
 				var shared_tile_set = [
-					map.tile.constructor.call(Object.create(map.tile), region_graphic, "floor", DM.MOVEMENT_FLOOR),
-					map.tile.constructor.call(Object.create(map.tile), region_graphic, "wall", DM.MOVEMENT_WALL),
-					map.tile.constructor.call(Object.create(map.tile), region_graphic, "pillar", DM.MOVEMENT_WALL),
-					map.tile.constructor.call(Object.create(map.tile), region_graphic, "water", DM.MOVEMENT_WATER)
+					map.tile.constructor.call(Object.create(map.tile), floor_theme.graphic, "floor", DM.MOVEMENT_FLOOR),
+					map.tile.constructor.call(Object.create(map.tile), floor_theme.graphic, "wall", DM.MOVEMENT_WALL),
+					map.tile.constructor.call(Object.create(map.tile), floor_theme.graphic, "pillar", DM.MOVEMENT_WALL),
+					map.tile.constructor.call(Object.create(map.tile), floor_theme.graphic, "water", DM.MOVEMENT_WATER)
 				];
 				var level_maze = maze_generator.generate_maze();
 				var dead_ends = Object.create(DM.list);

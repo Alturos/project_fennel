@@ -36,12 +36,34 @@ module.exports = (function (){
 		}
 	}
 	//
-	var unit_library = {
-		model_get: function (model_id){
-			var identified_model = this.models[model_id];
-			return identified_model;
+	var model_library = {
+		get_theme: function (theme_id){
+			var identified_theme = this.themes[theme_id];
+			return identified_theme;
 		},
-		models: {
+		get_unit: function (unit_id){
+			var identified_unit = this.units[unit_id];
+			//console.log(this.units.bug3);
+			//console.log(unit_id+'; '+identified_unit.graphic)
+			return identified_unit;
+		},
+		themes: {
+			plains: {
+				graphic: 'plains',
+				song: '',
+				infantry: ['bug1','bug2','bug2','bug2','bug2','bug3'],
+				cavalry: ['bug2'],
+				officer: ['bug3'],
+			},
+			cave: {
+				graphic: 'cave',
+				song: '',
+				infantry: ['bug1','bug2','bug2','bug2','bug2','bug3'],
+				cavalry: ['bug2'],
+				officer: ['bug3'],
+			}
+		},
+		units: {
 			bug1: Object.create(unit, {
 				_graphic: {value: 'bug1', writable: true},
 				faction: {value: DM.F_ENEMY},
@@ -67,6 +89,6 @@ module.exports = (function (){
 				behavior_name: {value: "behavior_bug"},
 			})
 		}
-	};
-	return unit_library;
+	}; 99
+	return model_library;
 })();

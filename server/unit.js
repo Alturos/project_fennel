@@ -1,11 +1,11 @@
 module.exports = (function (){
 	var DM = require('./DM.js');
 	var mover = require('./mover.js');
-	var map = require('./map.js');
+	//var map = require('./map.js');
 	var unit = Object.create(mover, {
 		// Redefined Values:
-		width: {value: map.tile_size, writable: true},
-		height: {value: map.tile_size, writable: true},
+		width: {value: 16/*map.tile_size*/, writable: true}, // TODO: MAGIC NUMBERS!
+		height: {value: 16/*map.tile_size*/, writable: true},
 		_graphic: {value: "adventurer", writable: true},
 		dense: {value: true, writable: true},
 		movement: {value: DM.MOVEMENT_FLOOR, writable: true},

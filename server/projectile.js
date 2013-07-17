@@ -27,7 +27,7 @@ module.exports = (function (){
 				this.owner = owner
 				if(!this.faction){
 					this.faction = this.owner.faction
-				} else{ console.log(this.faction)}
+				}
 				//this.owner.projectiles.add(src)
 				if(this.projecting){
 					this.project()

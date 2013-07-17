@@ -10,7 +10,7 @@ module.exports = (function (){
 		west: 8,
 		generate_maze: function (){
 			var new_maze = Object.create(generator.maze);
-			new_maze.setup(5,5,0.5,0.5);
+			new_maze.setup(3,3,0.5,0.5);
 			//new_maze.setup(15,10,0.6,0.5,1);
 			new_maze.generate();
 			for(var pos_y = 0; pos_y < new_maze.height; pos_y++){

@@ -45,12 +45,17 @@ module.exports = (function (){
 	};
 	map.region = {
 		id: undefined,
+		theme_id: undefined,
+		theme: undefined,
 		screen_grid: undefined,
 		active_screens: undefined,
 		grid_width: 16,
 		grid_height: 16,
-		constructor: function (id, width, height){
+		constructor: function (id, theme_id, width, height){
+			var model_library = require('./model_library.js');
 			this.id = id;
+			this.theme_id = theme_id;
+			this.theme = model_library.get_theme(theme_id);
 			map.regions[this.id] = this;
 			this.grid_width  = width  || this.grid_width ;
 			this.grid_height = height || this.grid_height;
@@ -216,9 +221,9 @@ module.exports = (function (){
 				mover.invulnerable(DM.TRANSITION_INVULNERABILITY_TIME*2);
 			}
 		},
-		add_mover: function (movers){
-			this.movers.add(movers);
-			if(!this.active){
+		add_mover: function (mover){
+			this.movers.add(mover);
+			if(!this.active && mover.faction){
 				this.activate();
 			}
 		},
@@ -484,19 +489,21 @@ module.exports = (function (){
 			parent_region.active_screens.remove(this);
 		},
 		populate: function (depth, theme){
-			var unit_library = require('./unit_library.js');
-			var unit = require('./unit.js'); // This here to prevent circular reference before either map or unit are finished.// TODO: replace this monster placement.
-			var random_units = ['bug1', 'bug1', 'bug1', 'bug2', 'bug2', 'bug3'];
+			var model_library = require('./model_library.js');
+			var random_units;// = ['bug1', 'bug1', 'bug1', 'bug2', 'bug2', 'bug3'];
 			var random_model_id;
 			var unit_model;
+			var parent_region = map.regions[this.region_id];
+			var parent_theme = parent_region.theme;
+			random_units = parent_theme.infantry;
 			var tile_count = this.grid_height*this.grid_width;
 			for(var y = 0; y < this.grid_height; y++){
 				for(var x = 0; x < this.grid_width; x++){
 					var test_tile = this.locate(x, y);
 					random_model_id = random_units[Math.floor(Math.random()*random_units.length)];
-					unit_model = unit_library.model_get(random_model_id);
+					unit_model = model_library.get_unit(random_model_id);
 					if((test_tile.movement&DM.MOVEMENT_FLOOR) && Math.random()*tile_count > tile_count - 5 && x!=0 && y!=0){
-						var M = unit.constructor.call(Object.create(unit_model), x*16, y*16, this);
+						var M = unit_model.constructor.call(Object.create(unit_model), x*16, y*16, this);
 					}
 				}
 			}
