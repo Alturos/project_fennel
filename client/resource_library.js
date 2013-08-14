@@ -1,5 +1,6 @@
 // Dependant on client.js
-var resource_path = 'resources/'//'/rsc/fennel/'
+var resource_path = 'resources/'
+//var resource_path = '/rsc/fennel/'
 client.resource = function (identifier){
 	return this.resource_library.resource(identifier);
 }
@@ -62,6 +63,17 @@ client.resource_library = {
 		"bug1": {url: resource_path + 'graphics/enemies.png', x:0, y:0, animate:2, dirs:4},
 		"bug2": {url: resource_path + 'graphics/enemies.png', x:0, y:32, animate:2, dirs:4},
 		"bug3": {url: resource_path + 'graphics/enemies.png', x:64, y:0, animate:2, dirs:4},
+		"eyeball1": {url: resource_path + 'graphics/enemies.png', height:17, x:128, y:0, animate:2, dirs:4},
+		"eyeball2": {url: resource_path + 'graphics/enemies.png', height:17, x:128, y:34, animate:2,  dirs:4},
+		"eyeball3": {url: resource_path + 'graphics/enemies.png', height:17, x:128, y:68, animate:2,  dirs:4},
+		"bat1": {url: resource_path + 'graphics/enemies.png', x:192, y:0, animate:2},
+		"bat2": {url: resource_path + 'graphics/enemies.png', x:208, y:0, animate:2},
+		"bat3": {url: resource_path + 'graphics/enemies.png', x:224, y:0, animate:2},
+		"spider": {url: resource_path + 'graphics/spider.png', width:32, height:32, animate:4, dirs:4, states:{
+			"level1": {},
+			"level2": {x:4},
+			"level3": {x:8}
+		}},
 		// I.d - Items
 		// I.d.1 - Droppable Items
 		"items": {url: resource_path + 'graphics/items.png', width: 8, height: 8, states: {
@@ -77,7 +89,9 @@ client.resource_library = {
 		// Projectiles and Effects
 		"fist": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:0, y:0, dirs: 4},
 		"fireball": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:32, y:0, animate:2, dirs: 4},
-		"shuriken": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:64, y:0, animate:3}
+		"silk": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x: 32, y: 16, animate:2, dirs: 4},
+		"shuriken": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:64, y:0, animate:3},
+		"web": {url: resource_path + 'graphics/projectiles.png', width: 32, height: 32, x:72, y:0}
 	},
 	setup: function (callback){
 		console.log("Setting up resources");

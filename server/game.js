@@ -124,45 +124,11 @@ module.exports = (function (){
 			new_mover.hp = new_mover.max_hp();
 			new_mover.mp = new_mover.max_mp()-1;
 			new_mover.intelligence_add(player);
+			new_mover.projectile_type = 'fist';
 			new_mover.primary = Object.create(this.usable);
 			new_mover.primary.effect = "asdf";
-			if(!this.fist_projectile){
-				this.fist_projectile = Object.create(game.projectile, {
-					_graphic: {value: 'fist', writable: true},
-					width: {value: 8},
-					height: {value: 8},
-					max_range: {value: 16},
-					speed: {value: 4},
-					potency: {value: 1},
-					constructor: {value: function (user, skill){
-						game.projectile.constructor.call(this, user, skill);
-						user.intelligence_add(this);
-						return this;
-					}},
-					dispose: {value: function (){
-						if(this.owner && this.owner._graphic_state == 'attack'){
-							this.owner.graphic_state = null;
-						}
-						game.projectile.dispose.call(this);
-					}},
-					handle_event: {value: function (controlled_mover, event){
-						if(controlled_mover == this){
-							return game.projectile.handle_event.call(this, controlled_mover, event);
-						}
-						switch(event.type){
-						case DM.EVENT_TAKE_TURN:
-							if(controlled_mover._graphic_state != 'attack'){
-								controlled_mover.graphic_state = 'attack';
-							}
-							return false;
-						}
-						return true;
-					}}
-				});
-			}
-			var fist_projectile = this.fist_projectile;
 			new_mover.primary["asdf"] = (function (user){
-				user.shoot(fist_projectile); //var M = game.projectile.constructor.call(Object.create(fist_projectile), new_mover, null);
+				user.shoot();
 			});
 			player.intelligence.send_message({"screen": first_level.start_screen.pack()})
 			player.attach_unit(new_mover);

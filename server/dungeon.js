@@ -19,7 +19,7 @@ module.exports = (function (){
 				}
 				var new_level = map.region.constructor.call(Object.create(map.region), this.id+' level '+depth, theme_id, 64, 64);
 				new_level.depth = depth;
-				var floor_theme = new_level.theme
+				var floor_theme = new_level.theme;
 				var shared_tile_set = [
 					map.tile.constructor.call(Object.create(map.tile), floor_theme.graphic, "floor", DM.MOVEMENT_FLOOR),
 					map.tile.constructor.call(Object.create(map.tile), floor_theme.graphic, "wall", DM.MOVEMENT_WALL),
@@ -41,11 +41,11 @@ module.exports = (function (){
 					}
 				}
 				var unused_dead_ends = dead_ends.copy();
-				var start_screen_index = Math.floor(Math.random()*unused_dead_ends.length);
-				new_level.start_screen = unused_dead_ends[start_screen_index];
+				//var start_screen_index = Math.floor(Math.random()*unused_dead_ends.length);
+				new_level.start_screen = DM.pick(unused_dead_ends);//[start_screen_index];
 				unused_dead_ends.remove(new_level.start_screen);
-				var boss_screen_index = Math.floor(Math.random()*unused_dead_ends.length);
-				new_level.boss_screen = unused_dead_ends[boss_screen_index];
+				//var boss_screen_index = Math.floor(Math.random()*unused_dead_ends.length);
+				new_level.boss_screen = DM.pick(unused_dead_ends);//[boss_screen_index];
 				unused_dead_ends.remove(new_level.boss_screen);
 				var stair_up = passage_up.constructor.call(Object.create(passage_up), 2, 2, new_level.start_screen);
 				var stair_down = passage_down.constructor.call(Object.create(passage_down), 2, 2, new_level.boss_screen);
@@ -91,6 +91,28 @@ module.exports = (function (){
 			var next_level = dungeon.get_level(map.regions[this.screen.region_id].depth+1);
 			var start_screen = next_level.start_screen;
 			this.screen.descend(mover, start_screen);
+		}},
+		activate: {value: function (){
+			var parent_region = map.regions[this.screen.region_id];
+			var depth = parent_region.depth;
+			var parent_theme = parent_region.theme;
+			var boss_models = parent_theme.boss[Math.min(depth, parent_theme.boss.length )-1];
+			var boss_model_id = boss_models;
+			var boss_model;
+			if(typeof boss_models !== 'string'){
+				boss_model_id = DM.pick(boss_models);//boss_models[Math.floor(Math.random()*boss_models.length)];
+			}
+			boss_model = model_library.get_model('unit', boss_model_id );
+			var tile_count = this.screen.grid_height*this.screen.grid_width;
+			var boss;
+			while(!boss){
+				var test_x = Math.floor(Math.random()*this.screen.grid_width );
+				var test_y = Math.floor(Math.random()*this.screen.grid_height);
+				var test_tile = this.screen.locate(test_x, test_y);
+				if(test_tile.movement&DM.MOVEMENT_FLOOR){
+					boss = boss_model.constructor.call(Object.create(boss_model), test_x*16, test_y*16, this.screen);
+				}
+			}
 		}}
 	});
 	return dungeon;

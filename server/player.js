@@ -35,7 +35,10 @@ module.exports = (function (){
 		},
 		handle_event: function (mover, event){
 			switch(event.type){
-				case DM.EVENT_TAKE_TURN: {
+				case DM.EVENT_INTELLIGENCE_ADDED:
+					return false;
+				break;
+				case DM.EVENT_TAKE_TURN:
 					if(!this.intelligence || !this.intelligence.connected){
 						if(++this.client_latency > 256){ // TODO: Magic numbers!
 							this.disconnect();
@@ -51,29 +54,26 @@ module.exports = (function (){
 							this.command(command_flags);
 						}
 					}
-					break;
-				}
-				case DM.EVENT_STOP: { break;}
-				case DM.EVENT_SCREEN_CROSS: {
+				break;
+				case DM.EVENT_STOP:
+				break;
+				case DM.EVENT_SCREEN_CROSS:
 					mover.screen.transition(mover, event.direction);
-					break;
-				}
-				case DM.EVENT_SCREEN_ENTER: {
+				break;
+				case DM.EVENT_SCREEN_ENTER:
 					if(this.intelligence){
 						this.intelligence.send_message({"screen": mover.screen.pack()});
 					}
-					break;
-				}
-				case DM.EVENT_STATUS_CHANGE: {
+				break;
+				case DM.EVENT_STATUS_CHANGE:
 					if(this.intelligence){
 						this.intelligence.send_message({"event": event});
 					}
-					break;
-				}
-				case DM.EVENT_DISPOSE: {
+				break;
+				case DM.EVENT_DISPOSE:
 					// TODO: Better game referencing :/
 					this.intelligence.game.spawn_unit(this);
-				}
+				break;
 			}
 		},
 		command: function(command){

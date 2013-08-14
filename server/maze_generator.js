@@ -132,9 +132,9 @@ module.exports = (function (){
 						var preferred_extentions = Math.round(indexed_set.length*this.extention_factor);
 						var extentions = Math.max(1, Math.min(indexed_set.length, preferred_extentions));
 						for(var extention_index = 0; extention_index < extentions; extention_index++){
-							var random_index = Math.floor(Math.random()*indexed_set.length);
-							random_index = Math.min(random_index, indexed_set.length-1);
-							var random_node = indexed_set[random_index];
+							/*var random_index = Math.floor(Math.random()*indexed_set.length);
+							random_index = Math.min(random_index, indexed_set.length-1);*/
+							var random_node = DM.pick(indexed_set);//indexed_set[random_index];
 							new_node = Object.create(generator.node, {
 								x: {value: random_node.x},
 								y: {value: random_node.y+1}

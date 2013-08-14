@@ -118,7 +118,9 @@ module.exports = (function (){
 						continue;
 					}
 					if(this.intelligences.indexOf(next_intelligence) == -1){ continue;}
-					var result = next_intelligence.handle_event(mover, event);
+					if(typeof next_intelligence.handle_event === 'function'){
+						var result = next_intelligence.handle_event(mover, event);
+					}
 					if(!result){
 						break;
 					}
@@ -129,8 +131,8 @@ module.exports = (function (){
 		}},
 		constructor: { value: function (x, y, width, height, screen){
 			id_manager.generate_id(this);
-			this.x = x || undefined;
-			this.y = y || undefined;
+			this.x = (x !== undefined)? x : undefined;
+			this.y = (y !== undefined)? y : undefined;
 			this.width  = width  || this.width;
 			this.height = height || this.height;
 			if(screen){
@@ -323,6 +325,10 @@ module.exports = (function (){
 				}	
 			}
 			this.y += delta_y;
+			/*if(this.screen){
+				this.x = Math.min(this.screen.grid_width *map.tile_size-this.width , Math.max(0, this.x))
+				this.y = Math.min(this.screen.grid_height*map.tile_size-this.height, Math.max(0, this.y))
+			}*/
 			if(delta_x || delta_y){
 				this.update_public({"x":this.x, "y":this.y});
 			}
@@ -369,6 +375,12 @@ module.exports = (function (){
 			if(!this.intelligences){
 				this.intelligences = Object.create(DM.list);
 			}
+			var current_intelligence = this.intelligences[0];
+			if(current_intelligence){
+				if(current_intelligence.handle_event(mover, {type: DM.EVENT_INTELLIGENCE_ADDED})){
+					this.intelligences.shift();
+				}
+			}
 			this.intelligences.unshift(new_intelligence);
 		}},
 		intelligence_remove: {value: function (old_intelligence){
@@ -380,7 +392,7 @@ module.exports = (function (){
 				this.intelligences = null;
 			}
 		}},
-		direction_to: {value: function (mover){
+		direction_to: {value: function (mover, diagonals){
 			var x_separation = 0;
 			var y_separation = 0;
 			var saved_dir_y = DM.SOUTH;
@@ -397,10 +409,14 @@ module.exports = (function (){
 				saved_dir_y = DM.NORTH;
 				y_separation = (this.y  - this.width  /2) - (mover.y + mover.width /2);
 			}
-			if(y_separation > x_separation){
-				return saved_dir_y;
+			if(diagonals){
+				return saved_dir_y | saved_dir_x;
 			} else{
-				return saved_dir_x;
+				if(y_separation > x_separation){
+					return saved_dir_y;
+				} else{
+					return saved_dir_x;
+				}
 			}
 		}}
 	});

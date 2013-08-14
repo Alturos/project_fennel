@@ -55,7 +55,7 @@ module.exports = (function (){
 			var model_library = require('./model_library.js');
 			this.id = id;
 			this.theme_id = theme_id;
-			this.theme = model_library.get_theme(theme_id);
+			this.theme = model_library.get_model('theme', theme_id);
 			map.regions[this.id] = this;
 			this.grid_width  = width  || this.grid_width ;
 			this.grid_height = height || this.grid_height;
@@ -470,6 +470,13 @@ module.exports = (function (){
 			this.active = true;
 			var parent_region = map.regions[this.region_id];
 			parent_region.active_screens.add(this);
+			var old_movers = this.movers.copy();
+			for(var mover_index = 0; mover_index < old_movers.length; mover_index++){
+				var indexed_mover = old_movers[mover_index];
+				if(typeof indexed_mover.activate === 'function'){
+					indexed_mover.activate();
+				}
+			}
 			this.populate(parent_region.depth, parent_region.theme);
 		},
 		deactivate: function (){
@@ -478,9 +485,13 @@ module.exports = (function (){
 			}
 			this.active = false;
 			this.peaceful_time = 0;
-			for(var mover_index = 0; mover_index < this.movers.length; mover_index++){
-				var indexed_mover = this.movers[mover_index];
+			var old_movers = this.movers.copy();
+			for(var mover_index = 0; mover_index < old_movers.length; mover_index++){
+				var indexed_mover = old_movers[mover_index];
 				if(indexed_mover.persistent){
+					if(typeof indexed_mover.deactivate === 'function'){
+						indexed_mover.deactivate();
+					}
 					continue;
 				}
 				indexed_mover.dispose();
@@ -490,23 +501,68 @@ module.exports = (function (){
 		},
 		populate: function (depth, theme){
 			var model_library = require('./model_library.js');
-			var random_units;// = ['bug1', 'bug1', 'bug1', 'bug2', 'bug2', 'bug3'];
-			var random_model_id;
-			var unit_model;
 			var parent_region = map.regions[this.region_id];
 			var parent_theme = parent_region.theme;
-			random_units = parent_theme.infantry;
+			var infantry_models = parent_theme.infantry[Math.min(depth, parent_theme.infantry.length)-1];
+			var cavalry_models  = parent_theme.cavalry[ Math.min(depth, parent_theme.cavalry.length )-1];
+			var officer_models  = parent_theme.officer[ Math.min(depth, parent_theme.officer.length )-1];
+			var infantry_model_id = infantry_models;
+			var cavalry_model_id = cavalry_models;
+			var officer_model_id = officer_models;
+			var infantry_model;
+			var cavalry_model;
+			var officer_model;
+			if(typeof infantry_models !== 'string'){
+				infantry_model_id = DM.pick(infantry_models);//infantry_models[Math.floor(Math.random()*infantry_models.length)];
+			}
+			if(typeof cavalry_models !== 'string'){
+				cavalry_model_id  = DM.pick(cavalry_models);//cavalry_models[Math.floor(Math.random()*cavalry_models.length)];
+			}
+			if(typeof officer_models !== 'string'){
+				officer_model_id  = DM.pick(officer_models);//officer_models[Math.floor(Math.random()*officer_models.length)];
+			}
+			infantry_model = model_library.get_model('unit', infantry_model_id);
+			cavalry_model  = model_library.get_model('unit', cavalry_model_id );
+			officer_model  = model_library.get_model('unit', officer_model_id );
 			var tile_count = this.grid_height*this.grid_width;
-			for(var y = 0; y < this.grid_height; y++){
+			var infantry_amount = 5;
+			var cavalry_amount = 2;
+			var officer_amount = 1;
+			for(var infantry_count = 0; infantry_count < infantry_amount; infantry_count){
+				var test_x = Math.floor(Math.random()*this.grid_width );
+				var test_y = Math.floor(Math.random()*this.grid_height);
+				var test_tile = this.locate(test_x, test_y);
+				if(test_tile.movement&DM.MOVEMENT_FLOOR){
+					infantry_model.constructor.call(Object.create(infantry_model), test_x*16, test_y*16, this);
+					infantry_count++;
+				}
+			}
+			for(var cavalry_count = 0; cavalry_count < cavalry_amount; cavalry_count){
+				var test_x = Math.floor(Math.random()*this.grid_width );
+				var test_y = Math.floor(Math.random()*this.grid_height);
+				var test_tile = this.locate(test_x, test_y);
+				if(test_tile.movement&DM.MOVEMENT_FLOOR){
+					cavalry_model.constructor.call(Object.create(cavalry_model), test_x*16, test_y*16, this);
+					cavalry_count++;
+				}
+			}
+			for(var officer_count = 0; officer_count < officer_amount; officer_count){
+				var test_x = Math.floor(Math.random()*this.grid_width );
+				var test_y = Math.floor(Math.random()*this.grid_height);
+				var test_tile = this.locate(test_x, test_y);
+				if(test_tile.movement&DM.MOVEMENT_FLOOR){
+					officer_model.constructor.call(Object.create(officer_model), test_x*16, test_y*16, this);
+					officer_count++;
+				}
+			}
+			/*for(var y = 0; y < this.grid_height; y++){
 				for(var x = 0; x < this.grid_width; x++){
 					var test_tile = this.locate(x, y);
-					random_model_id = random_units[Math.floor(Math.random()*random_units.length)];
-					unit_model = model_library.get_unit(random_model_id);
 					if((test_tile.movement&DM.MOVEMENT_FLOOR) && Math.random()*tile_count > tile_count - 5 && x!=0 && y!=0){
 						var M = unit_model.constructor.call(Object.create(unit_model), x*16, y*16, this);
 					}
 				}
-			}
+			}*/
 		}
 	};
 	map.tile = {

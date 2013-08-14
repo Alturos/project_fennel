@@ -4,7 +4,7 @@ module.exports = (function (){
 	var projectile = Object.create(mover, {
 		// Redefined Values:
 		collision_check_priority: {
-			value: DM.COLLISION_PRIORITY_UNIT,
+			value: DM.COLLISION_PRIORITY_PROJECTILE,
 			writable: true
 		},
 		movement: {
@@ -16,12 +16,32 @@ module.exports = (function (){
 			writable: true
 		},
 		// Redefined Functions:
-		constructor: {value: function (owner, skill){
+		constructor: {value: function (owner, skill, direction){
 			mover.constructor.call(this, undefined, undefined, undefined, undefined, owner.screen);
 			this.vel = {x:0, y:0};
 			//var center_loc = function (target, center){
 			this.x = owner.x + (owner.width  - this.width )/2;
 			this.y = owner.y + (owner.height - this.height)/2;
+			if(this.projecting){
+				switch(direction){
+					case undefined:
+					case null:
+					case false:
+					break;
+					case DM.NORTH:
+						this.y = owner.y;
+					break;
+					case DM.SOUTH:
+						this.y = owner.y + owner.height - this.height;
+					break;
+					case DM.EAST:
+						this.x = owner.x + owner.width - this.width;
+					break;
+					case DM.WEST:
+						this.x = owner.x;
+					break;
+				}
+			}
 			//}
 			if(owner){
 				this.owner = owner
@@ -160,13 +180,20 @@ module.exports = (function (){
 			this.dispose()
 		}},
 		attack: {value: function (mover){
-			mover.hurt(this.potency, this.owner, this)
+			if(this.potency){
+				mover.hurt(this.potency, this.owner, this)
+			}
 			if(!this.persistent){
 				if(this.explosive){
-					explode();
+					this.explode();
 				} else{
 					this.dispose();
 				}
+			}
+		}},
+		collect_item: {value: function (item){
+			if(this.owner && (typeof this.owner.collect_item === 'function')){
+				item.use(this.owner);
 			}
 		}}
 	});

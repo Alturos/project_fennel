@@ -54,6 +54,8 @@ module.exports = (function (){
 		aura_regen_rate: {value: 256, writable: true},
 		taxonomy: {value: DM.M_HUMAN, writable: true},
 		primary: {value: undefined, writable: true},
+		shoot_frequency: {value: undefined, writable: true},
+		projectile_type: {value: undefined, writable: true},
 		// Newly Defined Functions:
 		command: {value: function (command){
 			if(this.dead){ return;}
@@ -191,12 +193,13 @@ module.exports = (function (){
 			}*/
 		shoot: {value: function (projectile_model){
 			if(!projectile_model){
-				projectile_model = this.projectile_model
+				var model_library = require('./model_library.js'); // TODO: Factor out the placement of this.
+				projectile_model = model_library.get_model('projectile', this.projectile_type);
 			}
 			if(!projectile_model){
 				return;
 			}
-			projectile_model.constructor.call(Object.create(projectile_model), this, null);
+			projectile_model.constructor.call(Object.create(projectile_model), this, null, this.direction);
 		}},
 		adjust_hp: {value: function (amount){
 			var old_health = this.hp;
@@ -208,6 +211,15 @@ module.exports = (function (){
 			if(this.hp <= 0){
 				this.die();
 			}
+			return result;
+		}},
+		adjust_mp: {value: function (amount){
+			var old_magic = this.mp;
+			this.mp += amount;
+			this.mp = Math.min(this.max_mp(), Math.max(0, this.mp));
+			var delta_magic = this.mp - old_magic;
+			var result = delta_magic;
+			this.change_status("mp");
 			return result;
 		}},
 		attack: {value: function (target, amount, proxy){
@@ -283,6 +295,9 @@ module.exports = (function (){
 				}
 			}
 			return this.invulnerable_time;
+		}},
+		collect_item: {value: function (item){
+			item.use(this);
 		}},
 		change_status: {value: function (/* Accessed via arguments array*/){
 			var request_array = arguments;
