@@ -99,6 +99,7 @@ module.exports = (function (){
 	map.screen = {
 		disposed: false,
 		active: false,
+		safe: false,
 		peaceful_time: 0,
 		tile_set: undefined,
 		region_id: undefined,
@@ -111,6 +112,7 @@ module.exports = (function (){
 		tile_grid: undefined,
 		movers: undefined,
 		updated: undefined,
+		passage: undefined,
 		constructor: function (x, y, width, height){
 			this.x = x;
 			this.y = y;
@@ -327,7 +329,7 @@ module.exports = (function (){
 			}
 			if(!hostility){
 				this.peaceful_time++
-				if(this.peaceful_time >= DM.SCREEN_DEACTIVATION_TIME){
+				if(this.peaceful_time >= DM.SCREEN_DEACTIVATION_TIME || this.boss){
 					this.deactivate();
 					return;
 				}
@@ -363,99 +365,6 @@ module.exports = (function (){
 				}
 				
 			}
-		/*
-		iterate: function (_wave){
-			// TODO:: Unload screen if there are no players present.
-			for(var/game/hero/hero in game.heros){
-				hero.take_turn()
-				if(!hero){ continue}
-				for(var/game/map/mover/projectile/P in hero.projectiles){
-					P.take_turn()
-					for(var/game/enemy/enemy in orange(COLLISION_RANGE, P)){
-						if(enemy.invincible){ continue}
-						if(!P){ break}
-						if(!P.collision_check(enemy)){ continue}
-						P.impact(enemy)
-						}
-					}
-				if(hero.invulnerable){ continue}
-				for(var/game/hero/other_hero in orange(COLLISION_RANGE, hero)){
-					if(other_hero.invulnerable){ continue}
-					var/_collision = FALSE
-					if(    abs((hero.c.x+(hero.width /2)) - (other_hero.c.x+(other_hero.width /2))) < ((hero.width +other_hero.width )/2)-8){
-						if(abs((hero.c.y+(hero.height/2)) - (other_hero.c.y+(other_hero.height/2))) < ((hero.height+other_hero.height)/2)-8){
-							_collision = TRUE
-							}
-						}
-					if(!_collision){ continue}
-					var/delta_x = (other_hero.c.x+(other_hero.width /2)) - (hero.c.x+(hero.width /2))
-					var/delta_y = (other_hero.c.y+(other_hero.height/2)) - (hero.c.y+(hero.height/2))
-					var/over_x  = ((hero.width +other_hero.width )/2 - abs(delta_x)) * -sign(delta_x)
-					var/over_y  = ((hero.height+other_hero.height)/2 - abs(delta_y)) * -sign(delta_y)
-					hero.translate(        ceil(sign(over_x/2)),  round(sign(over_y/2)))
-					other_hero.translate(-round(sign(over_x/2)),  -ceil(sign(over_y/2)))
-					}
-				}
-			if(!(locate(/game/enemy) in enemies)){
-				win()
-				}
-			else{
-				for(var/game/enemy/enemy in enemies){
-					enemy.take_turn()
-					if(!enemy){ continue}
-					for(var/game/map/mover/projectile/P in enemy.projectiles){
-						P.take_turn()
-						for(var/game/hero/hero in orange(COLLISION_RANGE, P)){
-							if(hero.invincible){ continue}
-							if(!P){ break}
-							if(!P.collision_check(hero)){ continue}
-							P.impact(hero)
-							}
-						}
-					}
-				for(var/game/enemy/enemy in enemies){
-					if(!enemy.touch_damage){ continue}
-					for(var/game/hero/hero in range(COLLISION_RANGE, enemy)){
-						if(enemy.collision_check(hero)){
-							if(hero.reverseDamage>0) { hero.attack(enemy, hero.reverseDamage)}
-							else { enemy.attack(hero, enemy.touch_damage) }
-							}
-						}
-					}
-				}
-			for(var/game/item/item in items){
-				item.take_turn()
-				for(var/game/hero/hero in range(COLLISION_RANGE, item)){
-					if(item && item.collision_check(hero)){
-						item.activate(hero)
-						}
-					}
-				if(item && !item.no_collect){
-					for(var/game/hero/projectile/P in range(COLLISION_RANGE, item)){
-						if(!item){ break}
-						if(!P.owner){ continue}
-						if(P && item.collision_check(P)){
-							item.activate(P.owner, P)
-							break
-							}
-						}
-					}
-				if(item){
-					item.redraw()
-					}
-				}
-			for(var/game/map/mover/combatant/M in game.heros + enemies){
-				M.redraw()
-				for(var/game/map/mover/projectile/P in M.projectiles){
-					P.redraw()
-					}
-				}
-			spawn(game.speed){
-				if(wave == _wave){
-					iterate(_wave)
-					}
-				}
-			}*/
 		},
 		update: function (data){
 			if(!this.updated){
@@ -477,7 +386,9 @@ module.exports = (function (){
 					indexed_mover.activate();
 				}
 			}
-			this.populate(parent_region.depth, parent_region.theme);
+			if(!this.safe){
+				this.populate(parent_region.depth, parent_region.theme);
+			}
 		},
 		deactivate: function (){
 			if(!this.active){
@@ -506,12 +417,15 @@ module.exports = (function (){
 			var infantry_models = parent_theme.infantry[Math.min(depth, parent_theme.infantry.length)-1];
 			var cavalry_models  = parent_theme.cavalry[ Math.min(depth, parent_theme.cavalry.length )-1];
 			var officer_models  = parent_theme.officer[ Math.min(depth, parent_theme.officer.length )-1];
+			var boss_models  = parent_theme.boss[ Math.min(depth, parent_theme.boss.length )-1];
 			var infantry_model_id = infantry_models;
 			var cavalry_model_id = cavalry_models;
 			var officer_model_id = officer_models;
+			var boss_model_id = boss_models;
 			var infantry_model;
 			var cavalry_model;
 			var officer_model;
+			var boss_model;
 			if(typeof infantry_models !== 'string'){
 				infantry_model_id = DM.pick(infantry_models);//infantry_models[Math.floor(Math.random()*infantry_models.length)];
 			}
@@ -521,9 +435,17 @@ module.exports = (function (){
 			if(typeof officer_models !== 'string'){
 				officer_model_id  = DM.pick(officer_models);//officer_models[Math.floor(Math.random()*officer_models.length)];
 			}
+			if(typeof boss_models !== 'string'){
+				console.log(boss_models)
+				boss_model_id     = DM.pick(boss_models);
+			}
 			infantry_model = model_library.get_model('unit', infantry_model_id);
 			cavalry_model  = model_library.get_model('unit', cavalry_model_id );
 			officer_model  = model_library.get_model('unit', officer_model_id );
+			boss_model     = model_library.get_model('unit', boss_model_id    );
+			if(this.boss){
+				officer_model = boss_model;
+			}
 			var tile_count = this.grid_height*this.grid_width;
 			var infantry_amount = 5;
 			var cavalry_amount = 2;
@@ -551,8 +473,11 @@ module.exports = (function (){
 				var test_y = Math.floor(Math.random()*this.grid_height);
 				var test_tile = this.locate(test_x, test_y);
 				if(test_tile.movement&DM.MOVEMENT_FLOOR){
-					officer_model.constructor.call(Object.create(officer_model), test_x*16, test_y*16, this);
+					var created_unit = officer_model.constructor.call(Object.create(officer_model), test_x*16, test_y*16, this);
 					officer_count++;
+					if(this.boss){
+						created_unit.boss = true;
+					}
 				}
 			}
 			/*for(var y = 0; y < this.grid_height; y++){

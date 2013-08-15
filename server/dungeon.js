@@ -1,3 +1,10 @@
+/*
+ What am I trying to do?
+	Bosses need make work better.
+ What's wrong with bosses?
+	Bosses no need kill.
+	*/
+
 module.exports = (function (){
 	var DM = require('./DM.js');
 	var map = require('./map.js');
@@ -47,15 +54,19 @@ module.exports = (function (){
 				//var boss_screen_index = Math.floor(Math.random()*unused_dead_ends.length);
 				new_level.boss_screen = DM.pick(unused_dead_ends);//[boss_screen_index];
 				unused_dead_ends.remove(new_level.boss_screen);
+				new_level.start_screen.safe = true;
+				new_level.boss_screen.boss = true;
 				var stair_up = passage_up.constructor.call(Object.create(passage_up), 2, 2, new_level.start_screen);
 				var stair_down = passage_down.constructor.call(Object.create(passage_down), 2, 2, new_level.boss_screen);
+				new_level.start_screen.passage = stair_up;
+				new_level.boss_screen.passage = stair_down;
 				map.regions[new_level.id] = new_level;
 				this.levels[level_index] = new_level;
 			}
 			var indexed_level = this.levels[level_index];
 			return indexed_level;
 		}
-	}
+	};
 	var passage_up = Object.create(mover, {
 		_graphic: {value: 'ladder_up'},
 		movement: {value: DM.MOVEMENT_STATIONARY},
@@ -74,17 +85,29 @@ module.exports = (function (){
 		}}
 	});
 	var passage_down = Object.create(mover, {
-		_graphic: {value: 'ladder_down'},
+		_graphic: {value: undefined, writable: true},
 		movement: {value: DM.MOVEMENT_STATIONARY},
 		width: {value: map.tile_size},
 		height: {value: map.tile_size},
 		persistent: {value: true},
+		locked: {value: true, writable: true},
 		collision_check_priority: {value: DM.COLLISION_PRIORITY_GROUND},
 		constructor: { value: function (x, y, screen){
 			mover.constructor.call(this, x*map.tile_size, y*map.tile_size, this.width, this.height, screen);
 			return this;
 		}},
+		lock: {value: function (){
+			this.locked = true;
+			this.graphic = undefined;
+		}},
+		unlock: {value: function (){
+			this.locked = false;
+			this.graphic = 'ladder_down';
+		}},
 		collide: { value: function (mover){
+			if(this.locked){
+				return;
+			}
 			if(mover.faction != DM.F_PLAYER){
 				return;
 			}
@@ -92,7 +115,7 @@ module.exports = (function (){
 			var start_screen = next_level.start_screen;
 			this.screen.descend(mover, start_screen);
 		}},
-		activate: {value: function (){
+		/*activate: {value: function (){
 			var parent_region = map.regions[this.screen.region_id];
 			var depth = parent_region.depth;
 			var parent_theme = parent_region.theme;
@@ -113,6 +136,9 @@ module.exports = (function (){
 					boss = boss_model.constructor.call(Object.create(boss_model), test_x*16, test_y*16, this.screen);
 				}
 			}
+		}},*/
+		deactivate: {value: function (){
+			this.lock();
 		}}
 	});
 	return dungeon;

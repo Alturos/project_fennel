@@ -56,6 +56,7 @@ module.exports = (function (){
 		primary: {value: undefined, writable: true},
 		shoot_frequency: {value: undefined, writable: true},
 		projectile_type: {value: undefined, writable: true},
+		boss: {value: false, writable: true},
 		// Newly Defined Functions:
 		command: {value: function (command){
 			if(this.dead){ return;}
@@ -262,6 +263,9 @@ module.exports = (function (){
 		}},
 		die: {value: function (){
 			if(this.dead){ return}
+			if(this.boss && this.screen.passage){
+				this.screen.passage.unlock();
+			}
 			this.handle_event(this, DM.EVENT_DIED);
 			if(this.revivable){
 				this.dead = true;
