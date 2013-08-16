@@ -3,6 +3,7 @@ module.exports = (function (){
 	var unit = require('./unit.js');
 	var projectile = require('./projectile.js');
 	var item = require('./item.js');
+    var usable = require('./usable.js');
 	// TODO: Refactor placement of unit behaviors.
 	unit.behavior_normal = function (mover, event){
 		if(mover.dead){ return;}
@@ -56,6 +57,18 @@ module.exports = (function (){
 		}
 		this.behavior_normal(mover, event);
 	};
+    var player_unit = Object.create(unit, {
+		projectile_type: {value: 'fist'},
+		primary: {
+            writable: true,
+            value: Object.create(usable, {
+                effect: {value: 'asdf'},
+                asdf: {value: function (user){
+                    user.shoot();
+                }}
+            })
+        }
+    });
 	//
 	var model_library = {
 		get_model: function (category, model_id){
@@ -146,6 +159,20 @@ module.exports = (function (){
 			}
 		},
 		unit: {
+            archer: Object.create(player_unit, {
+                _graphic: {value: 'archer', writable: true},
+                base_body: {value: 7}
+            }),
+            acolyte: Object.create(player_unit, {
+                _graphic: {value: 'acolyte', writable: true}
+            }),
+            knight: Object.create(player_unit, {
+                _graphic: {value: 'knight', writable: true}
+            }),
+            mage: Object.create(player_unit, {
+                _graphic: {value: 'mage', writable: true}
+            }),
+            //
 			bug1: Object.create(unit, {
 				_graphic: {value: 'bug1', writable: true},
 				faction: {value: DM.F_ENEMY},

@@ -12,6 +12,7 @@ module.exports = (function (){
 		player: require('./player.js'),
 		commandable: require('./commandable.js'),
 		mover: require('./mover.js'),
+        model_library: require('./model_library.js'),
 		unit: require('./unit.js'),
 		usable: require('./usable.js'),
 		projectile: require('./projectile.js'),
@@ -100,36 +101,31 @@ module.exports = (function (){
 		spawn_unit: function (player){
 			var first_level = this.dungeon.get_level(1);
 			var unit_config = {
-				_graphic: {value: 'acolyte', writable: true},
-				faction: {value: 1},
-				revivable: {value: true}
+                faction: {value: 1},
+                revivable: {value: true}
 			};
+            var unit_id = 'adventurer';
 			switch(Math.floor(Math.random()*4)){
 			case 0:
 			case 4:
-				unit_config._graphic.value = "knight"
+				unit_id = "knight"
 			break;
 			case 1:
-				unit_config._graphic.value = "acolyte"
+				unit_id = "acolyte"
 			break;
 			case 2:
-				unit_config._graphic.value = "mage"
+				unit_id = "mage"
 			break;
 			case 3:
-				unit_config._graphic.value = "archer"
+				unit_id = "archer"
 			break;
 			}
+            var unit_model = this.model_library.get_model('unit', unit_id);
 			var start_screen = first_level.start_screen
-			var new_mover = this.unit.constructor.call(Object.create(this.unit, unit_config), 32, 32, start_screen);
+			var new_mover = this.unit.constructor.call(Object.create(unit_model, unit_config), 32, 32, start_screen);
 			new_mover.hp = new_mover.max_hp();
 			new_mover.mp = new_mover.max_mp()-1;
 			new_mover.intelligence_add(player);
-			new_mover.projectile_type = 'fist';
-			new_mover.primary = Object.create(this.usable);
-			new_mover.primary.effect = "asdf";
-			new_mover.primary["asdf"] = (function (user){
-				user.shoot();
-			});
 			player.intelligence.send_message({"screen": first_level.start_screen.pack()})
 			player.attach_unit(new_mover);
 			player.focus(new_mover);
