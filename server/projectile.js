@@ -20,28 +20,7 @@ module.exports = (function (){
 			mover.constructor.call(this, undefined, undefined, undefined, undefined, owner.screen);
 			this.vel = {x:0, y:0};
 			//var center_loc = function (target, center){
-			this.x = owner.x + (owner.width  - this.width )/2;
-			this.y = owner.y + (owner.height - this.height)/2;
-			if(this.projecting){
-				switch(direction){
-					case undefined:
-					case null:
-					case false:
-					break;
-					case DM.NORTH:
-						this.y = owner.y;
-					break;
-					case DM.SOUTH:
-						this.y = owner.y + owner.height - this.height;
-					break;
-					case DM.EAST:
-						this.x = owner.x + owner.width - this.width;
-					break;
-					case DM.WEST:
-						this.x = owner.x;
-					break;
-				}
-			}
+			this.center(owner);
 			//}
 			if(owner){
 				this.owner = owner
@@ -168,6 +147,30 @@ module.exports = (function (){
 			writable: true
 		},
 		// Newly Defined Functions:
+		center: {value: function (center_mover){
+			this.x = center_mover.x + (center_mover.width  - this.width )/2;
+			this.y = center_mover.y + (center_mover.height - this.height)/2;
+			if(this.projecting){
+				switch(this.direction){
+					case undefined:
+					case null:
+					case false:
+					break;
+					case DM.NORTH:
+						this.y = center_mover.y;
+					break;
+					case DM.SOUTH:
+						this.y = center_mover.y + center_mover.height - this.height;
+					break;
+					case DM.EAST:
+						this.x = center_mover.x + center_mover.width - this.width;
+					break;
+					case DM.WEST:
+						this.x = center_mover.x;
+					break;
+				}
+			}
+		}},
 		project: {value: function (dir){
 			if(!dir){ dir = this.owner.direction}
 			this.direction = dir

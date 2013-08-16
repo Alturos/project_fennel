@@ -58,13 +58,15 @@ module.exports = (function (){
 		this.behavior_normal(mover, event);
 	};
     var player_unit = Object.create(unit, {
-		projectile_type: {value: 'fist'},
+		projectile_type: {value: 'arrow'},
 		primary: {
             writable: true,
             value: Object.create(usable, {
                 effect: {value: 'asdf'},
                 asdf: {value: function (user){
                     user.shoot();
+					var attack_int = model_library.get_model('intelligence', 'attack');
+					user.intelligence_add(attack_int.constructor.call(Object.create(attack_int), user));
                 }}
             })
         }
@@ -245,6 +247,116 @@ module.exports = (function (){
 			})
 		},
 		projectile: {
+			arrow: Object.create(projectile, {
+				_graphic: {value: 'arrow', writable: true},
+				short_length: {value: 3},
+				long_length: {value: 16},
+				speed: {value: 8},
+				potency: {value: 1},
+				constructor: {value: function (user, skill, direction){
+					projectile.constructor.call(this, user, skill, direction);
+					this.direction = direction;
+					if(this.direction == DM.NORTH || this.direction == DM.SOUTH){
+						this.width = this.short_length;
+						this.height = this.long_length;
+					} else{
+						this.width = this.long_length;
+						this.height = this.short_length;
+					}
+					this.center(user);
+					return this;
+				}}
+			})/*,
+			sword: Object.create(projectile, {
+				_graphic: {value: 'sword', writable: true},
+				movement: {value: DM.MOVEMENT_ALL},
+				//projecting: {value: false},
+				/*long_length: {value: 8},
+				short_length: {value: 4},
+				persistent: {value: true},
+				potency: {value: 3},
+				stage: {value: 0},
+				speed: {value: 4},
+				lbehavior: {value: function(mover, event){
+					/*
+					this.stage++
+					this.dir = this.owner.dir
+					this.owner.graphic_state = [this.owner.rest_state? "[owner.rest_state]_" : ""]attack"
+					switch(stage){
+						if(1,5){
+							icon_state = "[state_name]_6"
+							switch(dir){
+								if(NORTH, SOUTH){
+									bound_height = 6
+									bound_width  = 4
+									}
+								if( EAST,  WEST){
+									bound_height = 4
+									bound_width  = 6
+									}
+								}
+							}
+						if(2,4){
+							icon_state = "[state_name]_11"
+							switch(dir){
+								if(NORTH, SOUTH){
+									bound_height = 11
+									bound_width  = 4
+									}
+								if( EAST,  WEST){
+									bound_height = 4
+									bound_width  = 11
+									}
+								}
+							}
+						if(3){
+							icon_state = "[state_name]_16"
+							switch(dir){
+								if(NORTH, SOUTH){
+									bound_height = 16
+									bound_width  = 4
+									}
+								if( EAST,  WEST){
+									bound_height = 4
+									bound_width  = 16
+									}
+								}
+							}
+						if(6){
+							owner.icon_state = owner.rest_state
+							del src
+							}
+						}
+					switch(dir){
+						if(NORTH){
+							step_x = owner.step_x + (owner.bound_width-bound_width)/2
+							step_y = owner.step_y + owner.bound_height
+							pixel_x = -6
+							}
+						if(SOUTH){
+							step_x = owner.step_x + (owner.bound_width-bound_width)/2
+							step_y = owner.step_y - bound_height
+							pixel_x = -6
+							pixel_y = -(16-bound_height)
+							}
+						if( EAST){
+							step_x = owner.step_x + owner.bound_width
+							step_y = owner.step_y + (owner.bound_height-bound_height)/2
+							pixel_y = -6
+							}
+						if( WEST){
+							step_x = owner.step_x - bound_width
+							step_y = owner.step_y + (owner.bound_height-bound_height)/2
+							pixel_y = -6
+							pixel_x = -(16-bound_width)
+							}
+						}
+					for(var/atom/movable/M in obounds(src,0)){
+						M.Crossed(src)
+						}
+					}
+				}}
+			})*/,
 			fist: Object.create(projectile, {
 				_graphic: {value: 'fist', writable: true},
 				width: {value: 8},
@@ -343,6 +455,34 @@ module.exports = (function (){
 			})
 		},
 		intelligence: {
+			attack: {
+				time_left: 6,
+				original_state: undefined,
+				constructor: function (attacker, time){
+					this.original_state = attacker.graphic_state;
+					attacker.graphic_state = 'attack'
+					if(time){
+						this.time_left = time;
+					}
+					return this;
+				},
+				handle_event: function (mover, event){
+					if(event.type === DM.EVENT_INTELLIGENCE_REMOVED){
+						if(mover.graphic_state == 'attack'){
+							mover.graphic_state = this.original_state || null;
+						}
+					}
+					if(event.type === DM.EVENT_TAKE_TURN){
+						if(--this.time_left > 0){
+							mover.graphic_state = 'attack'
+							return false;
+						} else{
+							mover.intelligence_remove(this);
+						}
+					}
+					return true;
+				}
+			},
 			freeze: {
 				time_left: DM.TRANSITION_INVULNERABILITY_TIME,
 				constructor: function (time){

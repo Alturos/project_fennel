@@ -378,7 +378,7 @@ module.exports = (function (){
 			var current_intelligence = this.intelligences[0];
 			if(current_intelligence){
 				if(current_intelligence.handle_event(mover, {type: DM.EVENT_INTELLIGENCE_ADDED})){
-					this.intelligences.shift();
+					this.intelligence_remove(current_intelligence);
 				}
 			}
 			this.intelligences.unshift(new_intelligence);
@@ -388,6 +388,7 @@ module.exports = (function (){
 				return;
 			}
 			this.intelligences.remove(old_intelligence);
+			old_intelligence.handle_event(this, {type: DM.EVENT_INTELLIGENCE_REMOVED});
 			if(!this.intelligences.length){
 				this.intelligences = null;
 			}

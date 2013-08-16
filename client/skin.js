@@ -185,6 +185,8 @@ client.skin = {
 			context.drawImage(resource.image, sprite_x, sprite_y, TILE_SIZE, TILE_SIZE, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		},
 		draw_graphic: function (graphic, state_name, x, y, direction, invulnerable){
+			x = Math.floor(x);
+			y = Math.floor(y);
 			// Beware MAGIC_NUMBERS!
 			var resource = client.resource(graphic);
 			if(!resource){
@@ -196,7 +198,7 @@ client.skin = {
 			var offset_y = 0;
 			var offset_width = resource.width || TILE_SIZE;
 			var offset_height = resource.height || TILE_SIZE;
-			var animate_frames = resource.animate || 1;
+			var animate_frames = resource.animate || 0;
 			var offset_dirs = resource.dirs || 1;
 			if(state){
 				if(state.x){
