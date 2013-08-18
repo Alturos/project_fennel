@@ -20,6 +20,7 @@ module.exports = (function (){
 			mover.constructor.call(this, undefined, undefined, undefined, undefined, owner.screen);
 			this.vel = {x:0, y:0};
 			//var center_loc = function (target, center){
+            this.direction = direction || (owner && owner.direction) || DM.SOUTH;
 			this.center(owner);
 			//}
 			if(owner){

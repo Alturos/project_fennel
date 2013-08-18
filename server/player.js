@@ -43,7 +43,7 @@ module.exports = (function (){
 						if(++this.client_latency > 256){ // TODO: Magic numbers!
 							this.disconnect();
 						}
-						return
+						return false
 					}
 					if(this.focused_mover && this.focused_mover.disposed){
 						this.focused_mover = undefined;
@@ -75,6 +75,7 @@ module.exports = (function (){
 					this.intelligence.game.spawn_unit(this);
 				break;
 			}
+            return true;
 		},
 		command: function(command){
 			if(this.focused_mover){

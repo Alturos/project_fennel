@@ -124,7 +124,7 @@ module.exports = (function (){
 			var start_screen = first_level.start_screen
 			var new_mover = this.unit.constructor.call(Object.create(unit_model, unit_config), 32, 32, start_screen);
 			new_mover.hp = new_mover.max_hp();
-			new_mover.mp = new_mover.max_mp()-1;
+			new_mover.mp = new_mover.max_mp();
 			new_mover.intelligence_add(player);
 			player.intelligence.send_message({"screen": first_level.start_screen.pack()})
 			player.attach_unit(new_mover);

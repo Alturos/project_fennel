@@ -58,18 +58,9 @@ module.exports = (function (){
 		this.behavior_normal(mover, event);
 	};
     var player_unit = Object.create(unit, {
-		projectile_type: {value: 'arrow'},
-		primary: {
-            writable: true,
-            value: Object.create(usable, {
-                effect: {value: 'asdf'},
-                asdf: {value: function (user){
-                    user.shoot();
-					var attack_int = model_library.get_model('intelligence', 'attack');
-					user.intelligence_add(attack_int.constructor.call(Object.create(attack_int), user));
-                }}
-            })
-        }
+		projectile_type: {value: 'fist', writable: true},
+        skill_id_primary: {value: 'melee'},
+        skill_id_secondary: {value: 'test_arrow'}
     });
 	//
 	var model_library = {
@@ -163,16 +154,27 @@ module.exports = (function (){
 		unit: {
             archer: Object.create(player_unit, {
                 _graphic: {value: 'archer', writable: true},
-                base_body: {value: 7}
+                projectile_type: {value: 'arrow', writable: true},
+                base_body: {value: 6},
+                base_aura: {value: 0},
+                base_speed: {value: 3}
             }),
             acolyte: Object.create(player_unit, {
-                _graphic: {value: 'acolyte', writable: true}
+                _graphic: {value: 'acolyte', writable: true},
+                base_body: {value: 6},
+                base_aura: {value: 3}
             }),
             knight: Object.create(player_unit, {
-                _graphic: {value: 'knight', writable: true}
+                _graphic: {value: 'knight', writable: true},
+                projectile_type: {value: 'sword', writable: true},
+                front_protection: {value: true},
+                base_body: {value: 10},
+                base_aura: {value: 0}
             }),
             mage: Object.create(player_unit, {
-                _graphic: {value: 'mage', writable: true}
+                _graphic: {value: 'mage', writable: true},
+                base_body: {value: 6},
+                base_aura: {value: 5}
             }),
             //
 			bug1: Object.create(unit, {
@@ -181,7 +183,9 @@ module.exports = (function (){
 				touch_damage: {value: 1},
 				base_speed: {value: 1},
 				base_body: {value: 1},
-				behavior_name: {value: "behavior_normal"}
+				behavior_name: {value: "behavior_normal"},
+				projectile_type: {value: 'arrow'},
+				shoot_frequency: {value: 32}
 			}),
 			bug2: Object.create(unit, {
 				_graphic: {value: 'bug2', writable: true},
@@ -189,7 +193,9 @@ module.exports = (function (){
 				touch_damage: {value: 1},
 				base_speed: {value: 1},
 				base_body: {value: 2},
-				behavior_name: {value: "behavior_normal"}
+				behavior_name: {value: "behavior_normal"},
+				projectile_type: {value: 'arrow'},
+				shoot_frequency: {value: 32}
 			}),
 			bug3: Object.create(unit, {
 				_graphic: {value: 'bug3', writable: true},
@@ -198,6 +204,8 @@ module.exports = (function (){
 				base_speed: {value: 1},
 				base_body: {value: 3},
 				behavior_name: {value: "behavior_normal"},
+				projectile_type: {value: 'sword'},
+				shoot_frequency: {value: 16}
 			}),
 			bat1: Object.create(unit, {
 				_graphic: {value: 'bat1', writable: true},
@@ -266,97 +274,86 @@ module.exports = (function (){
 					this.center(user);
 					return this;
 				}}
-			})/*,
+			}),
 			sword: Object.create(projectile, {
 				_graphic: {value: 'sword', writable: true},
 				movement: {value: DM.MOVEMENT_ALL},
-				//projecting: {value: false},
-				/*long_length: {value: 8},
-				short_length: {value: 4},
+				projecting: {value: false},
+				long_length: {value: 0, writable: true},
+				short_length: {value: 6},
 				persistent: {value: true},
-				potency: {value: 3},
-				stage: {value: 0},
-				speed: {value: 4},
-				lbehavior: {value: function(mover, event){
-					/*
-					this.stage++
-					this.dir = this.owner.dir
-					this.owner.graphic_state = [this.owner.rest_state? "[owner.rest_state]_" : ""]attack"
-					switch(stage){
-						if(1,5){
-							icon_state = "[state_name]_6"
-							switch(dir){
-								if(NORTH, SOUTH){
-									bound_height = 6
-									bound_width  = 4
-									}
-								if( EAST,  WEST){
-									bound_height = 4
-									bound_width  = 6
-									}
-								}
-							}
-						if(2,4){
-							icon_state = "[state_name]_11"
-							switch(dir){
-								if(NORTH, SOUTH){
-									bound_height = 11
-									bound_width  = 4
-									}
-								if( EAST,  WEST){
-									bound_height = 4
-									bound_width  = 11
-									}
-								}
-							}
-						if(3){
-							icon_state = "[state_name]_16"
-							switch(dir){
-								if(NORTH, SOUTH){
-									bound_height = 16
-									bound_width  = 4
-									}
-								if( EAST,  WEST){
-									bound_height = 4
-									bound_width  = 16
-									}
-								}
-							}
-						if(6){
-							owner.icon_state = owner.rest_state
-							del src
-							}
-						}
-					switch(dir){
-						if(NORTH){
-							step_x = owner.step_x + (owner.bound_width-bound_width)/2
-							step_y = owner.step_y + owner.bound_height
-							pixel_x = -6
-							}
-						if(SOUTH){
-							step_x = owner.step_x + (owner.bound_width-bound_width)/2
-							step_y = owner.step_y - bound_height
-							pixel_x = -6
-							pixel_y = -(16-bound_height)
-							}
-						if( EAST){
-							step_x = owner.step_x + owner.bound_width
-							step_y = owner.step_y + (owner.bound_height-bound_height)/2
-							pixel_y = -6
-							}
-						if( WEST){
-							step_x = owner.step_x - bound_width
-							step_y = owner.step_y + (owner.bound_height-bound_height)/2
-							pixel_y = -6
-							pixel_x = -(16-bound_width)
-							}
-						}
-					for(var/atom/movable/M in obounds(src,0)){
-						M.Crossed(src)
-						}
+				potency: {value: 2},
+				stage: {value: 0, writable: true},
+				speed: {value: 0},
+				constructor: {value: function (user, skill, direction){
+					projectile.constructor.call(this, user, skill, direction);
+					user.intelligence_add(this);
+                    this.handle_event(this, {type: DM.EVENT_TAKE_TURN})
+					return this;
+				}},
+				handle_event: {value: function (controlled_mover, event){
+					if(controlled_mover != this){
+                        return projectile.handle_event.call(this, controlled_mover, event);
 					}
+					switch(event.type){
+                        default:
+                            return projectile.handle_event.call(this, controlled_mover, event);
+                        break;
+                        case DM.EVENT_TAKE_TURN:
+                            if(controlled_mover._graphic_state != 'attack'){
+                                controlled_mover.graphic_state = 'attack';
+                            }
+                            this.stage++;
+                            this.direction = this.owner.direction;
+                            switch(this.stage){
+                                case 1: case 5:
+                                    this.graphic_state = '1';
+                                    this.long_length = 6;
+                                break;
+                                case 2: case 4:
+                                    this.graphic_state = '2';
+                                    this.long_length = 11;
+                                break;
+                                case 3:
+                                    this.graphic_state = '3';
+                                    this.long_length = 16;
+                                break;
+                                case 6:
+                                    this.dispose();
+                                break;
+                            }
+                            switch(this.direction){
+                                case DM.SOUTH:
+                                    this.width = this.short_length;
+                                    this.height = this.long_length;
+                                    this.x = this.owner.x + (this.owner.width - this.width)/2;
+                                    this.y = this.owner.y + this.owner.height;
+                                break;
+                                case DM.NORTH:
+                                    this.width = this.short_length;
+                                    this.height = this.long_length;
+                                    this.x = this.owner.x + (this.owner.width - this.width)/2;
+                                    this.y = this.owner.y - this.height;
+                                break;
+                                case DM.EAST:
+                                    this.width = this.long_length;
+                                    this.height = this.short_length;
+                                    this.x = this.owner.x + this.owner.width;
+                                    this.y = this.owner.y + (this.owner.height - this.height)/2;
+                                break;
+                                case DM.WEST:
+                                    this.width = this.long_length;
+                                    this.height = this.short_length;
+                                    this.x = this.owner.x - this.width;
+                                    this.y = this.owner.y + (this.owner.height - this.height)/2;
+                                break;
+                            }
+                            return false;
+                        break;
+                    }
+					return true;
 				}}
-			})*/,
+			}),
 			fist: Object.create(projectile, {
 				_graphic: {value: 'fist', writable: true},
 				width: {value: 8},
@@ -457,9 +454,7 @@ module.exports = (function (){
 		intelligence: {
 			attack: {
 				time_left: 6,
-				original_state: undefined,
 				constructor: function (attacker, time){
-					this.original_state = attacker.graphic_state;
 					attacker.graphic_state = 'attack'
 					if(time){
 						this.time_left = time;
@@ -469,7 +464,7 @@ module.exports = (function (){
 				handle_event: function (mover, event){
 					if(event.type === DM.EVENT_INTELLIGENCE_REMOVED){
 						if(mover.graphic_state == 'attack'){
-							mover.graphic_state = this.original_state || null;
+							mover.graphic_state = null;
 						}
 					}
 					if(event.type === DM.EVENT_TAKE_TURN){
@@ -502,7 +497,25 @@ module.exports = (function (){
 					return true;
 				}
 			}
-		}
+		},
+        skill: {
+            melee:  Object.create(usable, {
+                effect: {value: 'melee'},
+                melee: {value: function (user){
+                    user.shoot();
+					var attack_int = model_library.get_model('intelligence', 'attack');
+					user.intelligence_add(attack_int.constructor.call(Object.create(attack_int), user));
+                }}
+            }),
+            test_arrow: Object.create(usable, {
+                effect: {value: 'whatever'},
+                whatever: {value: function (user){
+                    user.shoot(model_library.get_model('projectile','arrow'))
+					var attack_int = model_library.get_model('intelligence', 'attack');
+					user.intelligence_add(attack_int.constructor.call(Object.create(attack_int), user));
+                }}
+            }),
+        }
 	};
 	return model_library;
 })();

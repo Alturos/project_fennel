@@ -6,7 +6,7 @@ client.preferences = {
 	"39": DM.EAST,
 	"32": DM.PRIMARY,
 	"90": DM.SECONDARY,
-	"988": DM.TERTIARY,
-	"967": DM.QUATERNARY,
-	"965": DM.MENU
+	"88": DM.TERTIARY,
+	"67": DM.QUATERNARY,
+	"65": DM.MENU
 }

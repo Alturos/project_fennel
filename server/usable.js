@@ -7,7 +7,7 @@ module.exports = (function (){
 		cast: {value: false, writable: true},
 		range: {value: undefined, writable: true},
 		use: {value: function (user){
-			if(user.mp < this.cost){ return false;}
+			if(this.cost && user.mp < this.cost){ return false;}
 			//user.adjust_mp(-this.cost);
 			if(this.cast){
 				//user.cast_time(7)

@@ -46,6 +46,36 @@ module.exports = (function (){
 			value     : undefined,
 			writable  : true
 		},
+		_x: {
+			value     : 0,
+			writable  : true
+		},
+		x: {
+			set: function (value){
+				this._x = value;
+				this.update_public({
+					x: this._x
+				});
+			},
+			get: function (){
+				return this._x;
+			}
+		},
+		_y: {
+			value     : 0,
+			writable  : true
+		},
+		y: {
+			set: function (value){
+				this._y = value;
+				this.update_public({
+					y: this._y
+				});
+			},
+			get: function (){
+				return this._y;
+			}
+		},
 		_direction: {
 			value     : DM.SOUTH,
 			writable  : true
@@ -108,6 +138,7 @@ module.exports = (function (){
 			writable: true
 		},
 		handle_event: {value: function (mover, event){
+            var result = true;
 			if(this.intelligences){
 				var int_copy = this.intelligences.copy()
 				for(var I = 0; I < int_copy.length; I++){
@@ -119,7 +150,7 @@ module.exports = (function (){
 					}
 					if(this.intelligences.indexOf(next_intelligence) == -1){ continue;}
 					if(typeof next_intelligence.handle_event === 'function'){
-						var result = next_intelligence.handle_event(mover, event);
+						result = next_intelligence.handle_event(mover, event);
 					}
 					if(!result){
 						break;
@@ -128,6 +159,7 @@ module.exports = (function (){
 			} else if(this.behavior_name && this[this.behavior_name]){
 				this[this.behavior_name].call(this, mover, event);
 			}
+            return result;
 		}},
 		constructor: { value: function (x, y, width, height, screen){
 			id_manager.generate_id(this);
@@ -380,6 +412,9 @@ module.exports = (function (){
 				if(current_intelligence.handle_event(mover, {type: DM.EVENT_INTELLIGENCE_ADDED})){
 					this.intelligence_remove(current_intelligence);
 				}
+			}
+			if(!this.intelligences){
+				this.intelligences = Object.create(DM.list);
 			}
 			this.intelligences.unshift(new_intelligence);
 		}},

@@ -17,6 +17,19 @@ module.exports = (function (){
 			mover.constructor.call(this, x, y, undefined, undefined, screen);
 			this.hp = this.base_body;
 			this.mp = this.base_aura;
+            var model_library = require('./model_library.js');
+            if(typeof this.skill_id_primary == 'string' && !this.primary){
+                this.primary = model_library.get_model('skill', this.skill_id_primary);
+            }
+            if(typeof this.skill_id_secondary == 'string' && !this.secondary){
+                this.secondary = model_library.get_model('skill', this.skill_id_secondary);
+            }
+            if(typeof this.skill_id_tertiary == 'string' && !this.tertiary){
+                this.tertiary = model_library.get_model('skill', this.skill_id_tertiary);
+            }
+            if(typeof this.skill_id_quaternary == 'string' && !this.quaternary){
+                this.quaternary = model_library.get_model('skill', this.skill_id_quaternary);
+            }
 			return this;
 		}},
 		dispose: {value: function (){
@@ -66,6 +79,11 @@ module.exports = (function (){
 			if(command & DM.PRIMARY){
 				if(this.primary){
 					this.primary.use(this);
+				}
+			}
+			if(command & DM.SECONDARY){
+				if(this.secondary){
+					this.secondary.use(this);
 				}
 			}
 			/*if(command & DM.SECONDARY){
@@ -130,17 +148,17 @@ module.exports = (function (){
 			return this.augment("aura", this.base_aura)
 		}},
 		max_hp: {value: function (){
-			var hp_bonus = this.max_body()+2
-			if(this.shield){ hp_bonus += this.shield.health_bonus}
+			var hp_bonus = this.max_body();
+			/*if(this.shield){ hp_bonus += this.shield.health_bonus}
 			if(this.armor ){ hp_bonus +=  this.armor.health_bonus}
-			if(this.charm ){ hp_bonus +=  this.charm.health_bonus}
+			if(this.charm ){ hp_bonus +=  this.charm.health_bonus}*/
 			return hp_bonus
 		}},
 		max_mp: {value: function (){
-			var mp_bonus = this.max_aura()+3
-			if(this.shield){ mp_bonus += this.shield.magic_bonus}
+			var mp_bonus = this.max_aura();
+			/*if(this.shield){ mp_bonus += this.shield.magic_bonus}
 			if(this.armor ){ mp_bonus +=  this.armor.magic_bonus}
-			if(this.charm ){ mp_bonus +=  this.charm.magic_bonus}
+			if(this.charm ){ mp_bonus +=  this.charm.magic_bonus}*/
 			return mp_bonus
 		}},
 		speed: {value: function (){
@@ -233,20 +251,20 @@ module.exports = (function (){
 			if(this.invulnerable()){
 				return
 			}
-			/*
-			var/dir_to_attack = dir_to(src, (proxy? proxy : attacker))
-			if(icon_state == rest_state && augment("front_protection", FALSE)){
-				if(proxy && dir_to_attack == dir){
-					damage = augment("front_damage", damage)
-					if(front_protection || !damage){
-						var/recoil_dir = turn(dir_to_attack, 180)
-						push(recoil_dir, 1,  7)
-						push(recoil_dir, 3, 15)
-						return
-					}
-				}
-			}
-			if(spam_attack_block){
+            if(proxy){
+                var dir_to_attack = this.direction_to(proxy);
+                if(!this.graphic_state && this.front_protection){
+                    if(dir_to_attack == this.direction){
+                        var push_dir = DM.flip(dir_to_attack);
+                        var push_time = 3;
+                        var push_speed = 3;
+                        var pusher = unit.pusher.constructor.call(Object.create(unit.pusher), push_dir, push_time, push_speed);
+                        this.intelligence_add(pusher);
+                        return
+                    }
+                }
+            }
+			/*if(spam_attack_block){
 				invulnerable = INVULNERABLE_TIME
 			}*/
 			//else{

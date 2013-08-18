@@ -89,7 +89,11 @@ client.resource_library = {
 		// Projectiles and Effects
 		"fist": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:0, y:0, dirs: 4},
 		"arrow": {url: resource_path + 'graphics/projectiles.png', width: 16, height: 16, x:0, y:5*16, dirs: 4},
-		"sword": {url: resource_path + 'graphics/projectiles.png', width: 16, height: 16, x:0, y:32, dirs: 4},
+		"sword": {url: resource_path + 'graphics/projectiles.png', width: 16, height: 16, x:0, y:32, dirs: 4, states: {
+            "1": {},
+            "2": {y:1},
+            "3": {y:2},
+        }},
 		"fireball": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:32, y:0, animate:2, dirs: 4},
 		"silk": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x: 32, y: 16, animate:2, dirs: 4},
 		"shuriken": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:64, y:0, animate:3},
