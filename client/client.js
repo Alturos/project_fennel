@@ -20,26 +20,43 @@ var client = {
 	},
 	focused_mover_id: undefined,
 	update_screen: function (data_array){
-		if(!this.screen){ return}
-		for(var I = 0; I < data_array.length; I++){
-			var update_object = data_array[I];
-			var id = update_object.id;
-			var old_object = this.screen.movers[id]
-			if(update_object.dispose || update_object.transition){
+		var screen = this.screen;
+		if(!screen){ return}
+		var handle_mover = function (up_obj, up_id){
+			var old_object = screen.movers[up_id]
+			if(up_obj.dispose || up_obj.transition){
 				if(old_object){
-					delete this.screen.movers[id]
+					delete screen.movers[up_id]
 				}
 			}
 			else{
 				if(!old_object){
 					old_object = {};
-					this.screen.movers[id] = old_object;
+					screen.movers[up_id] = old_object;
 				}
-				for(var key in update_object){
+				for(var key in up_obj){
 					if(key != "id"){
-						old_object[key] = update_object[key];
+						old_object[key] = up_obj[key];
 					}
 				}
+			}
+		}
+		var handle_event = function (up_obj){
+			if(!screen.events){
+				screen.events = Object.create(DM.list);
+			}
+			var event_model = client.resource('event', up_obj.event);
+			if(!event_model){ return}
+			var event = Object.create(event_model);
+			event.setup(up_obj.data);
+			screen.events.add(event);
+		}
+		for(var I = 0; I < data_array.length; I++){
+			var update_object = data_array[I];
+			if(update_object.id){
+				handle_mover(update_object, update_object.id);
+			} else if(update_object.event){
+				handle_event(update_object);
 			}
 		}
 	},

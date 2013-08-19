@@ -134,6 +134,31 @@ client.skin = {
 						mover.invulnerable && !transitioning
 					);
 				}
+				if(client.screen.events){
+					var events_copy = client.screen.events.copy();
+					for(var event_index = 0; event_index < events_copy.length; event_index++){
+						var indexed_event = events_copy[event_index];
+						if(indexed_event.finished){
+							client.screen.events.remove(indexed_event)
+							continue;
+						}
+						indexed_event.iterate();
+						if(indexed_event.sprites){
+							for(var sprite_index = 0; sprite_index < indexed_event.sprites.length; sprite_index++){
+								var indexed_sprite = indexed_event.sprites[sprite_index];
+								this.draw_graphic(
+									indexed_sprite.graphic,
+									indexed_sprite.graphic_state,
+									indexed_sprite.x+transition_offset_x,
+									indexed_sprite.y+transition_offset_y,
+									indexed_sprite.direction,
+									undefined,
+									true
+								)
+							}
+						}
+					}
+				}
 			}
 			if(client.focus_current && client.focus_current.display){
 				client.focus_current.display(this.context, x_offset, y_offset, this.width, this.height);
@@ -160,7 +185,7 @@ client.skin = {
 			}
 		},
 		draw_tile: function (tile, x, y, context){
-			var resource = client.resource(tile.graphic);
+			var resource = client.resource('graphic', tile.graphic);
 			if(!resource){
 				console.log('No such resource: '+tile.graphic)
 				return;
@@ -184,11 +209,11 @@ client.skin = {
 			}
 			context.drawImage(resource.image, sprite_x, sprite_y, TILE_SIZE, TILE_SIZE, x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
 		},
-		draw_graphic: function (graphic, state_name, x, y, direction, invulnerable){
+		draw_graphic: function (graphic, state_name, x, y, direction, invulnerable, center){
 			x = Math.floor(x);
 			y = Math.floor(y);
 			// Beware MAGIC_NUMBERS!
-			var resource = client.resource(graphic);
+			var resource = client.resource('graphic', graphic);
 			if(!resource){
 				console.log('No such resource: '+graphic)
 				return;
@@ -237,8 +262,9 @@ client.skin = {
 				break;
 				}
 			}
+			var frame_rate = resource.frame_rate || 6;
 			if(animate_frames){
-				offset_y += Math.floor(this.display_time/this.display_speed*6)%animate_frames;
+				offset_y += Math.floor(this.display_time/this.display_speed*frame_rate)%animate_frames;
 			}
 			var sprite_image = resource.image;
 			//var resource_offset_x = resource.x+offset_x;
@@ -264,7 +290,23 @@ client.skin = {
 				sprite_offset_x = 0;
 				sprite_offset_y = 0;
 			}
-			this.context.drawImage(sprite_image, sprite_offset_x, sprite_offset_y, sprite_width, sprite_height, x, y, sprite_width, sprite_height);
+			var centered_x = x;
+			var centered_y = y;
+			if(center){
+				centered_x -= offset_width/2;
+				centered_y -= offset_height/2;
+			}
+			this.context.drawImage(
+				sprite_image,
+				sprite_offset_x,
+				sprite_offset_y,
+				sprite_width,
+				sprite_height,
+				centered_x,
+				centered_y,
+				sprite_width,
+				sprite_height
+			);
 		},
 		transition: function (direction){
 			if(!direction){

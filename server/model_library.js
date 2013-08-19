@@ -32,7 +32,7 @@ module.exports = (function (){
 			case 3: mover.direction = DM.WEST; break;
 			}
 		break;
-		case DM.DIED:
+		case DM.EVENT_DIED:
 			if(Math.random() < DM.ITEM_DROP_PROBABILITY){
 				var item_model_id = DM.pick(DM.ITEM_ARRAY);
 				var item_model = model_library.get_model('item', item_model_id);
@@ -59,8 +59,7 @@ module.exports = (function (){
 	};
     var player_unit = Object.create(unit, {
 		projectile_type: {value: 'fist', writable: true},
-        skill_id_primary: {value: 'melee'},
-        skill_id_secondary: {value: 'test_arrow'}
+        skill_id_primary: {value: 'melee'}
     });
 	//
 	var model_library = {
@@ -76,6 +75,7 @@ module.exports = (function (){
 				use: {value: function (mover){
 					var healed = mover.adjust_hp(this.potency);
 					if(healed){
+						mover.screen.add_event('heal_sparkle', {x: mover.x+mover.width/2, y: mover.y+mover.height/2});
 						this.dispose();
 					}
 				}}
@@ -86,6 +86,7 @@ module.exports = (function (){
 				use: {value: function (mover){
 					var healed = mover.adjust_hp(this.potency);
 					if(healed){
+						mover.screen.add_event('heal_sparkle', {x: mover.x+mover.width/2, y: mover.y+mover.height/2});
 						this.dispose();
 					}
 				}}
@@ -98,6 +99,7 @@ module.exports = (function (){
 					}
 					var healed = mover.adjust_mp(mover.max_mp());
 					if(healed){
+						mover.screen.add_event('aura_sparkle', {x: mover.x+mover.width/2, y: mover.y+mover.height/2});
 						this.dispose();
 					}
 				}}
@@ -146,9 +148,9 @@ module.exports = (function (){
 				graphic: 'cave',
 				song: '',
 				infantry: ['','bat1','eyeball1','eyeball1'],
-				cavalry: ['','eyeball1','eyeball2','spider1'],
+				cavalry: ['','spine1','spine2','spine3'],
 				officer: ['','eyeball2','spider1','spider1'],
-				boss: ['spider1']
+				boss: ['','spine3']
 			}
 		},
 		unit: {
@@ -162,7 +164,9 @@ module.exports = (function (){
             acolyte: Object.create(player_unit, {
                 _graphic: {value: 'acolyte', writable: true},
                 base_body: {value: 6},
-                base_aura: {value: 3}
+                base_aura: {value: 3},
+				aura_regen_rate: {value: 96},
+				skill_id_secondary: {value: 'heal'}
             }),
             knight: Object.create(player_unit, {
                 _graphic: {value: 'knight', writable: true},
@@ -174,7 +178,10 @@ module.exports = (function (){
             mage: Object.create(player_unit, {
                 _graphic: {value: 'mage', writable: true},
                 base_body: {value: 6},
-                base_aura: {value: 5}
+                base_aura: {value: 5},
+				aura_regen_rate: {value: 96},
+				skill_id_secondary: {value: 'fireball'},
+				skill_id_tertiary: {value: 'fireblast'}
             }),
             //
 			bug1: Object.create(unit, {
@@ -183,9 +190,7 @@ module.exports = (function (){
 				touch_damage: {value: 1},
 				base_speed: {value: 1},
 				base_body: {value: 1},
-				behavior_name: {value: "behavior_normal"},
-				projectile_type: {value: 'arrow'},
-				shoot_frequency: {value: 32}
+				behavior_name: {value: "behavior_normal"}
 			}),
 			bug2: Object.create(unit, {
 				_graphic: {value: 'bug2', writable: true},
@@ -193,9 +198,7 @@ module.exports = (function (){
 				touch_damage: {value: 1},
 				base_speed: {value: 1},
 				base_body: {value: 2},
-				behavior_name: {value: "behavior_normal"},
-				projectile_type: {value: 'arrow'},
-				shoot_frequency: {value: 32}
+				behavior_name: {value: "behavior_normal"}
 			}),
 			bug3: Object.create(unit, {
 				_graphic: {value: 'bug3', writable: true},
@@ -203,9 +206,7 @@ module.exports = (function (){
 				touch_damage: {value: 2},
 				base_speed: {value: 1},
 				base_body: {value: 3},
-				behavior_name: {value: "behavior_normal"},
-				projectile_type: {value: 'sword'},
-				shoot_frequency: {value: 16}
+				behavior_name: {value: "behavior_normal"}
 			}),
 			bat1: Object.create(unit, {
 				_graphic: {value: 'bat1', writable: true},
@@ -252,6 +253,53 @@ module.exports = (function (){
 					unit.shoot.call(this);
 					this.direction = DM.flip(this.direction);
 				}}
+			}),
+			spine1: Object.create(require('./snake.js'), {
+				_graphic: {value: 'skull', writable: true},
+				_graphic_state: {value: 'level1', writable: true},
+				body_state: {value: 'spine1'},
+				faction: {value: DM.F_ENEMY},
+				touch_damage: {value: 1},
+				base_speed: {value: 1},
+				//base_body: {value: 3, writable: true},
+				body_health: {value: 1},
+				body_width: {value: 9},
+				length: {value: 5},
+				width: {value: 13},
+				height: {value: 16},
+				behavior_name: {value: "behavior_normal"},
+			}),
+			spine2: Object.create(require('./snake.js'), {
+				_graphic: {value: 'skull', writable: true},
+				_graphic_state: {value: 'level2', writable: true},
+				body_state: {value: 'spine1'},
+				faction: {value: DM.F_ENEMY},
+				touch_damage: {value: 2},
+				base_speed: {value: 1},
+				//base_body: {value: 3, writable: true},
+				body_health: {value: 1},
+				body_width: {value: 9},
+				length: {value: 9},
+				width: {value: 13},
+				height: {value: 16},
+				behavior_name: {value: "behavior_normal"},
+				projectile_type: {value: 'fireball'},
+				shoot_frequency: {value: 64}
+			}),
+			spine3: Object.create(require('./snake.js'), {
+				_graphic: {value: 'skull', writable: true},
+				_graphic_state: {value: 'level3', writable: true},
+				body_state: {value: 'spine3'},
+				faction: {value: DM.F_ENEMY},
+				touch_damage: {value: 2},
+				base_speed: {value: 2},
+				//base_body: {value: 3, writable: true},
+				body_health: {value: 2},
+				body_width: {value: 9},
+				length: {value: 9},
+				width: {value: 13},
+				height: {value: 16},
+				behavior_name: {value: "behavior_normal"},
 			})
 		},
 		projectile: {
@@ -361,17 +409,12 @@ module.exports = (function (){
 				max_range: {value: 16},
 				speed: {value: 4},
 				potency: {value: 1},
+				persistent: {value: true},
 				movement: {value: DM.MOVEMENT_ALL},
 				constructor: {value: function (user, skill, direction){
 					projectile.constructor.call(this, user, skill, direction);
 					user.intelligence_add(this);
 					return this;
-				}},
-				dispose: {value: function (){
-					if(this.owner && this.owner._graphic_state == 'attack'){
-						this.owner.graphic_state = null;
-					}
-					projectile.dispose.call(this);
 				}},
 				handle_event: {value: function (controlled_mover, event){
 					if(controlled_mover == this){
@@ -379,9 +422,6 @@ module.exports = (function (){
 					}
 					switch(event.type){
 					case DM.EVENT_TAKE_TURN:
-						if(controlled_mover._graphic_state != 'attack'){
-							controlled_mover.graphic_state = 'attack';
-						}
 						return false;
 					}
 					return true;
@@ -449,6 +489,24 @@ module.exports = (function (){
 					})
 					this.dispose();
 				}}
+			}),
+			fireball: Object.create(projectile, {
+				_graphic: {value: 'fireball', writable: true},
+				width: {value: 8},
+				height: {value: 8},
+				max_range: {value: 128},
+				speed: {value: 6},
+				potency: {value: 1},
+				movement: {value: DM.MOVEMENT_FLOOR}
+			}),
+			fireball_large: Object.create(projectile, {
+				_graphic: {value: 'fireball_large', writable: true},
+				width: {value: 16},
+				height: {value: 16},
+				speed: {value: 6},
+				potency: {value: 2},
+				max_range: {value: 0},
+				movement: {value: DM.MOVEMENT_FLOOR}
 			})
 		},
 		intelligence: {
@@ -470,6 +528,32 @@ module.exports = (function (){
 					if(event.type === DM.EVENT_TAKE_TURN){
 						if(--this.time_left > 0){
 							mover.graphic_state = 'attack'
+							return false;
+						} else{
+							mover.intelligence_remove(this);
+						}
+					}
+					return true;
+				}
+			},
+			cast: {
+				time_left: 6,
+				constructor: function (caster, time){
+					caster.graphic_state = 'cast'
+					if(time){
+						this.time_left = time;
+					}
+					return this;
+				},
+				handle_event: function (mover, event){
+					if(event.type === DM.EVENT_INTELLIGENCE_REMOVED){
+						if(mover.graphic_state == 'cast'){
+							mover.graphic_state = null;
+						}
+					}
+					if(event.type === DM.EVENT_TAKE_TURN){
+						if(--this.time_left > 0){
+							mover.graphic_state = 'cast'
 							return false;
 						} else{
 							mover.intelligence_remove(this);
@@ -515,6 +599,56 @@ module.exports = (function (){
 					user.intelligence_add(attack_int.constructor.call(Object.create(attack_int), user));
                 }}
             }),
+            heal: Object.create(usable, {
+                effect: {value: 'whatever'},
+				cost: {value: 1},
+                whatever: {value: function (user){
+					var effect_screen = user.screen;
+					var movers = effect_screen.movers.copy();
+					var max_index = movers.length-1;
+					var effect_width = 64;
+					var m1 = undefined;
+					var m2 = {
+						x: user.x + (user.width-effect_width)/2,
+						y: user.y + (user.height-effect_width)/2,
+						width: effect_width,
+						height: effect_width
+					};
+					for(var mover_index = 0; mover_index <= max_index; mover_index++){
+						var indexed_mover = movers[mover_index];
+						if(typeof indexed_mover.adjust_hp != 'function'){ continue}
+						if(effect_screen.movers.indexOf(indexed_mover) == -1){ continue}
+						if(indexed_mover.faction != user.faction){ continue}
+						m1 = indexed_mover;
+						if(    Math.abs(m1.x+m1.width /2 - (m2.x+m2.width /2)) < (m1.width +m2.width )/2){
+							if(Math.abs(m1.y+m1.height/2 - (m2.y+m2.height/2)) < (m1.height+m2.height)/2){
+								indexed_mover.adjust_hp(1, user);
+							}
+						}
+					}
+					var cast_int = model_library.get_model('intelligence', 'cast');
+					user.intelligence_add(cast_int.constructor.call(Object.create(cast_int), user));
+					effect_screen.add_event('heal_sparkles', {x: user.x+user.width/2, y: user.y+user.height/2});
+                }}
+            }),
+            fireball: Object.create(usable, {
+                effect: {value: 'whatever'},
+				cost: {value: 1},
+                whatever: {value: function (user){
+                    user.shoot(model_library.get_model('projectile','fireball'))
+					var cast_int = model_library.get_model('intelligence', 'cast');
+					user.intelligence_add(cast_int.constructor.call(Object.create(cast_int), user));
+                }}
+            }),
+            fireblast: Object.create(usable, {
+                effect: {value: 'whatever'},
+				cost: {value: 2},
+                whatever: {value: function (user){
+                    user.shoot(model_library.get_model('projectile','fireball_large'))
+					var cast_int = model_library.get_model('intelligence', 'cast');
+					user.intelligence_add(cast_int.constructor.call(Object.create(cast_int), user));
+                }}
+            })
         }
 	};
 	return model_library;

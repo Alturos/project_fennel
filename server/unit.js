@@ -65,6 +65,8 @@ module.exports = (function (){
 		invincible: {value: false, writable: true},
 		body_regen_rate: {value: 2048, writable: true},
 		aura_regen_rate: {value: 256, writable: true},
+		body_wait_time: {value: -1, writable: true},
+		aura_wait_time: {value: -1, writable: true},
 		taxonomy: {value: DM.M_HUMAN, writable: true},
 		primary: {value: undefined, writable: true},
 		shoot_frequency: {value: undefined, writable: true},
@@ -84,6 +86,11 @@ module.exports = (function (){
 			if(command & DM.SECONDARY){
 				if(this.secondary){
 					this.secondary.use(this);
+				}
+			}
+			if(command & DM.TERTIARY){
+				if(this.tertiary){
+					this.tertiary.use(this);
 				}
 			}
 			/*if(command & DM.SECONDARY){
@@ -187,11 +194,17 @@ module.exports = (function (){
 					adjust_hp(1, src)
 					}
 				}
-			if(mp < max_aura()){
-				if(!(game.time % augment("aura_regen", aura_regen_rate))){
-					adjust_mp(1, src)
-					}
+			*/
+			if(this.mp < this.max_aura()){
+				if(this.aura_wait_time < 0){
+					this.aura_wait_time = this.aura_regen_rate;
 				}
+				this.aura_wait_time--;
+				if(this.aura_wait_time == 0){
+					this.adjust_mp(1, this)
+				}
+			}
+			/*
 			. = ..()
 			}*/
 		}},
@@ -284,7 +297,7 @@ module.exports = (function (){
 			if(this.boss && this.screen.passage){
 				this.screen.passage.unlock();
 			}
-			this.handle_event(this, DM.EVENT_DIED);
+			this.handle_event(this, {type: DM.EVENT_DIED});
 			if(this.revivable){
 				this.dead = true;
 				this.death_timer = 256;

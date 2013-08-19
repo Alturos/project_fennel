@@ -12,6 +12,10 @@ module.exports = (function (){
 			value     : false,
 			writable  : true
 		},
+		update_sent_to_screen: {
+			value: undefined,
+			writable: true
+		},
 		_screen: {
 			value     : undefined,
 			writable  : true
@@ -204,8 +208,9 @@ module.exports = (function (){
 			for(var key in data){
 				this.updated_public[key] = data[key];
 			}
-			if(this.screen){
+			if(this.screen && !this.update_sent_to_screen){
 				this.screen.update(this.updated_public);
+				this.update_sent_to_screen = true;
 			}
 			if("transition" in data){
 				this.updated_public = null;

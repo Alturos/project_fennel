@@ -88,7 +88,7 @@ client.unit_interface = {
 		redraw: function (){
 			if(!this.context){ return;}
 			this.context.clearRect(0,0, client.skin.canvas.width, client.skin.canvas.height);
-			var resource_image = client.resource("hud").image;
+			var resource_image = client.resource('graphic', "hud").image;
 			var current = this.hp[0];
 			var base = this.hp[1];
 			var max = this.hp[2];

@@ -229,6 +229,12 @@ module.exports = (function (){
 				this.activate();
 			}
 		},
+		add_event: function (event_type, data){
+			this.update({
+				'event': event_type,
+				'data': data
+			});
+		},
 		transition: function (mover, direction){
 			var new_screen = this.adjacent(direction, mover.x, mover.y)[0];
 			if(!new_screen){ return;}
@@ -363,7 +369,12 @@ module.exports = (function (){
 						}
 					}
 				}
-				
+			}
+			movers_copy = this.movers;
+			for(var I = 0; I < movers_copy.length; I++){
+				var mover = movers_copy[I];
+				mover.updated_public = undefined;
+				mover.update_sent_to_screen = false;
 			}
 		},
 		update: function (data){
@@ -436,7 +447,6 @@ module.exports = (function (){
 				officer_model_id  = DM.pick(officer_models);//officer_models[Math.floor(Math.random()*officer_models.length)];
 			}
 			if(typeof boss_models !== 'string'){
-				console.log(boss_models)
 				boss_model_id     = DM.pick(boss_models);
 			}
 			infantry_model = model_library.get_model('unit', infantry_model_id);
@@ -455,7 +465,8 @@ module.exports = (function (){
 				var test_y = Math.floor(Math.random()*this.grid_height);
 				var test_tile = this.locate(test_x, test_y);
 				if(test_tile.movement&DM.MOVEMENT_FLOOR){
-					infantry_model.constructor.call(Object.create(infantry_model), test_x*16, test_y*16, this);
+					var infantry_unit = infantry_model.constructor.call(Object.create(infantry_model), test_x*16, test_y*16, this);
+					infantry_unit.direction = DM.pick([DM.EAST, DM.WEST, DM.NORTH, DM.SOUTH]);
 					infantry_count++;
 				}
 			}
@@ -464,7 +475,8 @@ module.exports = (function (){
 				var test_y = Math.floor(Math.random()*this.grid_height);
 				var test_tile = this.locate(test_x, test_y);
 				if(test_tile.movement&DM.MOVEMENT_FLOOR){
-					cavalry_model.constructor.call(Object.create(cavalry_model), test_x*16, test_y*16, this);
+					var cavalry_unit = cavalry_model.constructor.call(Object.create(cavalry_model), test_x*16, test_y*16, this);
+					cavalry_unit.direction = DM.pick([DM.EAST, DM.WEST, DM.NORTH, DM.SOUTH]);
 					cavalry_count++;
 				}
 			}
@@ -474,6 +486,7 @@ module.exports = (function (){
 				var test_tile = this.locate(test_x, test_y);
 				if(test_tile.movement&DM.MOVEMENT_FLOOR){
 					var created_unit = officer_model.constructor.call(Object.create(officer_model), test_x*16, test_y*16, this);
+					created_unit.direction = DM.pick([DM.EAST, DM.WEST, DM.NORTH, DM.SOUTH]);
 					officer_count++;
 					if(this.boss){
 						created_unit.boss = true;
