@@ -1,6 +1,6 @@
 // Dependant on client.js
 var resource_path = 'resources/'
-var resource_path = '/rsc/fennel/'
+//var resource_path = '/rsc/fennel/'
 client.resource = function (category, identifier){
 	return this.resource_library.resource(category, identifier);
 }
@@ -50,19 +50,22 @@ client.resource_library = {
 			"adventurer": {url: resource_path + 'graphics/adventurer.png', x:0, y:0, animate:2, dirs:4, states: {
 				"attack": {x:0, y:2, animate:1, dirs:4}
 			}},
-			"archer": {url: resource_path + 'graphics/archer.png', x:0, y:0, animate:2, dirs:4, states: {
+			"knight": {url: resource_path + 'graphics/knight.png', x:0, y:0, animate:2, dirs:4, states: {
+				"attack": {x:0, y:2, animate:1, dirs:4}
+			}},
+			"lancer": {url: resource_path + 'graphics/lancer.png', x:0, y:0, animate:2, dirs:4, states: {
 				"attack": {x:0, y:2, animate:1, dirs:4}
 			}},
 			"acolyte": {url: resource_path + 'graphics/acolyte.png', x:0, y:0, animate:2, dirs:4, states: {
 				"attack": {x:0, y:2, animate:1, dirs:4},
 				"cast": {x:0, y:3, animate:1, dirs:4}
 			}},
-			"knight": {url: resource_path + 'graphics/knight.png', x:0, y:0, animate:2, dirs:4, states: {
-				"attack": {x:0, y:2, animate:1, dirs:4}
-			}},
 			"mage": {url: resource_path + 'graphics/mage.png', x:0, y:0, animate:2, dirs:4, states: {
 				"attack": {x:0, y:2, animate:1, dirs:4},
 				"cast": {x:0, y:3, animate:1, dirs:4}
+			}},
+			"archer": {url: resource_path + 'graphics/archer.png', x:0, y:0, animate:2, dirs:4, states: {
+				"attack": {x:0, y:2, animate:1, dirs:4}
 			}},
 			// I.c.2 - Enemies
 			"bug1": {url: resource_path + 'graphics/enemies.png', x:0, y:0, animate:2, dirs:4},
@@ -99,10 +102,12 @@ client.resource_library = {
 			"fist": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:0, y:0, dirs: 4},
 			"arrow": {url: resource_path + 'graphics/projectiles.png', width: 16, height: 16, x:0, y:5*16, dirs: 4},
 			"sword": {url: resource_path + 'graphics/projectiles.png', width: 16, height: 16, x:0, y:32, dirs: 4, states: {
-				"1": {},
-				"2": {y:1},
-				"3": {y:2},
+				"1": {}, "2": {y:1}, "3": {y:2},
 			}},
+			"lance": {url: resource_path + 'graphics/projectiles.png', width: 16, height: 16, x:0, y:96, dirs: 4, states: {
+				"1": {}, "2": {y:1}, "3": {y:2},
+			}},
+			"axe": {url: resource_path + 'graphics/projectiles.png', width: 16, height: 16, x:64, y:32, dirs: 8},
 			"fireball": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x:32, y:0, animate:2, dirs: 4},
 			"fireball_large": {url: resource_path + 'graphics/projectiles.png', width: 16, height: 16, x:104, y:0, animate:2, dirs: 4},
 			"silk": {url: resource_path + 'graphics/projectiles.png', width: 8, height: 8, x: 32, y: 16, animate:2, dirs: 4},

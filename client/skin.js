@@ -41,6 +41,9 @@ client.skin = {
 			this.scrap_board.width = TILE_SIZE*4;
 			this.scrap_board.height = TILE_SIZE*4;
 			this.scrap_board = this.scrap_board.getContext("2d");
+			/*setInterval(function (){
+				client.skin.screen.redraw();
+			}, FRAME_RATE)*/
 			// The canvas can be accessed later via scrap_board.canvas
 		},
 		redraw: function (){
@@ -245,21 +248,33 @@ client.skin = {
 					offset_dirs = state.dirs;
 				}
 			}
-			if(offset_dirs == 4){
+			if(offset_dirs > 1){
 				switch(direction){
-				case undefined:
-				break;
-				case DM.SOUTH:
-				break;
-				case DM.NORTH:
-					offset_x += 1;
-				break;
-				case DM.EAST:
-					offset_x += 2;
-				break;
-				case DM.WEST:
-					offset_x += 3;
-				break;
+					case undefined:
+					break;
+					case DM.SOUTH:
+					break;
+					case DM.NORTH:
+						offset_x += 1;
+					break;
+					case DM.EAST:
+						offset_x += 2;
+					break;
+					case DM.WEST:
+						offset_x += 3;
+					break;
+					case DM.SOUTHEAST:
+						offset_x += 4;
+					break;
+					case DM.SOUTHWEST:
+						offset_x += 5;
+					break;
+					case DM.NORTHEAST:
+						offset_x += 6;
+					break;
+					case DM.NORTHWEST:
+						offset_x += 7;
+					break;
 				}
 			}
 			var frame_rate = resource.frame_rate || 6;

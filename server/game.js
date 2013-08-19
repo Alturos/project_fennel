@@ -1,6 +1,5 @@
 module.exports = (function (){
 	var DM = require('./DM.js');
-	var uuuu = require('./unit.js');
 	// Dependant upon DM.js
 	function call_iterate(){
 		game.iterate();
@@ -97,6 +96,7 @@ module.exports = (function (){
 				var player = this.players[I];
 				player.update_client();
 			}
+			this.map.clear_updates();
 		},
 		spawn_unit: function (player){
 			var first_level = this.dungeon.get_level(1);
@@ -120,9 +120,10 @@ module.exports = (function (){
 				unit_id = "archer"
 			break;
 			}
+				unit_id = "lancer"
             var unit_model = this.model_library.get_model('unit', unit_id);
 			var start_screen = first_level.start_screen
-			var new_mover = this.unit.constructor.call(Object.create(unit_model, unit_config), 32, 32, start_screen);
+			var new_mover = unit_model.constructor.call(Object.create(unit_model, unit_config), 32, 32, start_screen);
 			new_mover.hp = new_mover.max_hp();
 			new_mover.mp = new_mover.max_mp();
 			new_mover.intelligence_add(player);

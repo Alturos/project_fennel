@@ -1,3 +1,5 @@
+var GAME_SPEED = 1000/25;
+var FRAME_RATE = GAME_SPEED;
 var DOM_GAME_CONTAINER = "casual_quest";
 var MAGIC_NUMBER = 240;
 var TILE_SIZE = 16;

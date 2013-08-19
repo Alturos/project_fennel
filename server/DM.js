@@ -6,6 +6,10 @@ var DM = {
 	SOUTH: 2,
 	EAST: 4,
 	WEST: 8,
+	NORTHEAST: 5,
+	NORTHWEST: 9,
+	SOUTHEAST: 6,
+	SOUTHWEST: 10,
 	PRIMARY: 16,
 	SECONDARY: 32,
 	TERTIARY: 64,
@@ -20,6 +24,43 @@ var DM = {
 			case DM.WEST : return DM.EAST;
 		}
 		return 0;
+	},
+	turn: function turn(dir, degrees){
+		if(isNaN(degrees)){
+			return NaN;
+		}
+		var start_degree;
+		var end_degree
+		switch(dir){
+			case DM.EAST     : {start_degree =   0; break}
+			case DM.NORTHEAST: {start_degree =  45; break}
+			case DM.NORTH    : {start_degree =  90; break}
+			case DM.NORTHWEST: {start_degree = 135; break}
+			case DM.WEST     : {start_degree = 180; break}
+			case DM.SOUTHWEST: {start_degree = 225; break}
+			case DM.SOUTH    : {start_degree = 270; break}
+			case DM.SOUTHEAST: {start_degree = 315; break}
+			default: { return NaN}
+		}
+		start_degree += degrees;
+		while(start_degree < 0){
+			start_degree += 360;
+		}
+		while(start_degree >= 360){
+			start_degree -= 360;
+		}
+		switch(start_degree){
+			case    0: {end_degree = DM.EAST     ; break}
+			case   45: {end_degree = DM.NORTHEAST; break}
+			case   90: {end_degree = DM.NORTH    ; break}
+			case  135: {end_degree = DM.NORTHWEST; break}
+			case  180: {end_degree = DM.WEST     ; break}
+			case  225: {end_degree = DM.SOUTHWEST; break}
+			case  270: {end_degree = DM.SOUTH    ; break}
+			case  315: {end_degree = DM.SOUTHEAST; break}
+			default: {return NaN}
+		}
+		return end_degree;
 	},
 	// Game logistics & metrics:
 	GAME_SPEED: 1000/25,
@@ -41,7 +82,7 @@ var DM = {
 	COLLISION_PRIORITY_UNIT: 1,
 	COLLISION_PRIORITY_PROJECTILE: 2,
 	COLLISION_PRIORITY_GROUND: 3,
-	TRANSITION_INVULNERABILITY_TIME: 24,
+	TRANSITION_INVULNERABILITY_TIME: 22,
 	// Intelligence sniffable events
 	EVENT_TAKE_TURN: 1,
 	EVENT_STOP: 2,

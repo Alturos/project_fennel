@@ -83,12 +83,12 @@ module.exports = (function (){
 			}
 			return unit.constructor.call(this, x, y, screen);
 		}},
-		take_turn: {value: function (mover, event){
+		take_turn: {value: function (){
 			var old_coord = {x: this.x, y: this.y};
 			old_coord.x += (this.width)/2;
 			old_coord.y += (this.height)/2;
 			this.old_positions.unshift(old_coord);
-			unit.take_turn.call(this, mover, event);
+			unit.take_turn.call(this);
 			for(var body_index = 0; body_index < this.body.length; body_index++){
 				var old_index = Math.floor((body_index+1) * this.body_width/this.speed());
 				if(old_index < this.old_positions.length){
@@ -104,6 +104,23 @@ module.exports = (function (){
 				}
 			}
 			this.old_positions.length = Math.min(this.old_positions.length, Math.floor(this.body.length*this.body_width/this.speed()))
+		}},
+		handle_event: {value: function (mover, event){
+			var result = true;
+			if(mover != this){ return unit.handle_event.call(mover, event)}
+			result = unit.handle_event.call(this, mover, event);
+			if(event.type == DM.EVENT_SCREEN_CROSS){
+				this.old_positions.length = 0;
+				for(var body_index = 0; body_index < this.body.length; body_index++){
+					var body_segment = this.body[body_index];
+					if(body_segment){
+						this.screen.add_mover(body_segment);
+						body_segment.x = this.x;
+						body_segment.y = this.y;
+					}
+				}
+			}
+			return result
 		}},
 		speed: {value: function (){
 			return this.base_speed;

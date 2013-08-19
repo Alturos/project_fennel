@@ -28,42 +28,36 @@ client.networking = {
 		var redraw = false;
 		for(var key in data){
 			switch(key){
-				case "chat": {
+				case "chat":
 					client.chat.receive_data(data[key]);
-					break;
-				}
-				case "redraw": {
+				break;
+				case "redraw":
 					redraw = true;
-					break;
-				}
-				case "screen": {
+				break;
+				case "screen":
 					client.transition(data[key]);
 					//client.screen = data[key];
 					redraw = true;
-					break;
-				}
-				case "focused_mover": {
+				break;
+				case "focused_mover":
 					client.focused_mover_id = data[key];
 					redraw = true;
-					break;
-				}
-				case "update": {
+				break;
+				case "update":
 					var update = data[key];
 					if(update){
 						client.update_screen(update);
 					}
 					redraw = true;
-					break;
-				}
-				case "event": {
+				break;
+				case "event":
 					var event = data[key];
 					switch(event.type){
-						case DM.EVENT_STATUS_CHANGE: {
+						case DM.EVENT_STATUS_CHANGE:
 							client.unit_interface.status_change(event);
-							break;
-						}
+						break;
 					}
-				}
+				break;
 			}
 		}
 		if(redraw){

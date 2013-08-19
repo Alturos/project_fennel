@@ -22,7 +22,13 @@ module.exports = (function (){
 					continue;
 				}
 				var region = regions_copy[region_name];
-				region.iterate()
+				region.iterate();
+			}
+		},
+		clear_updates: function (){
+			for(var region_name in this.regions){
+				var region = this.regions[region_name];
+				region.clear_updates();
 			}
 		}/*,
 		generate_dungeon: function (screens_width, file_name){
@@ -93,6 +99,16 @@ module.exports = (function (){
 					continue;
 				}
 				screen.iterate();
+			}
+		},
+		clear_updates: function (){
+			var screens_copy = this.active_screens.copy();
+			for(var I = 0; I < this.active_screens.length; I++){
+				var screen = this.active_screens[I];
+				if(!screen){
+					continue;
+				}
+				screen.clear_updates();
 			}
 		}
 	}
@@ -214,9 +230,9 @@ module.exports = (function (){
 			return tile;
 		},
 		descend: function(mover, new_screen){
-			mover.update_public({"transition": true});
-			this.movers.remove(mover);
-			mover.screen = new_screen;
+			//mover.update_public({"transition": true});
+			//this.movers.remove(mover);
+			//mover.screen = new_screen;
 			new_screen.add_mover(mover);
 			mover.handle_event(mover, {type: DM.EVENT_SCREEN_ENTER, screen_name: new_screen.name});
 			if((typeof mover.invulnerable) == 'function'){
@@ -224,7 +240,16 @@ module.exports = (function (){
 			}
 		},
 		add_mover: function (mover){
+			if(mover.screen){
+				mover.update_public({"transition": true});
+				mover.screen.movers.remove(mover);
+			}
 			this.movers.add(mover);
+			mover.updated_public = undefined;
+			mover.update_sent_to_screen = false;
+			mover.screen = this;
+			var public_pack = mover.pack_public();
+			mover.update_public(public_pack)
 			if(!this.active && mover.faction){
 				this.activate();
 			}
@@ -238,9 +263,8 @@ module.exports = (function (){
 		transition: function (mover, direction){
 			var new_screen = this.adjacent(direction, mover.x, mover.y)[0];
 			if(!new_screen){ return;}
-			mover.update_public({"transition": true});
-			this.movers.remove(mover);
-			mover.screen = new_screen;
+			//mover.update_public({"transition": true});
+			//this.movers.remove(mover);
 			new_screen.add_mover(mover);
 			if((typeof mover.invulnerable) == 'function'){
 				mover.invulnerable(DM.TRANSITION_INVULNERABILITY_TIME);
@@ -313,7 +337,7 @@ module.exports = (function (){
 		},
 		iterate: function (){
 			if(this.disposed){ return;}
-			this.updated = false;
+			this.update({ping: true})
 			var hostility = false;
 			var active_faction;
 			var movers_copy = this.movers.copy();
@@ -376,6 +400,9 @@ module.exports = (function (){
 				mover.updated_public = undefined;
 				mover.update_sent_to_screen = false;
 			}
+		},
+		clear_updates: function (){
+			this.updated = undefined;
 		},
 		update: function (data){
 			if(!this.updated){
